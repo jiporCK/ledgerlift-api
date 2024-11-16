@@ -14,14 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
+    private final AuthService authService;
+
     @PostMapping("/login")
     public AuthResponse login(@RequestBody LoginRequest request) {
-        return null;
+        return authService.login(request);
     }
 
     @PostMapping("/refresh")
     public AuthResponse refresh(@RequestBody RefreshTokenRequest request) {
-        return null;
+        return authService.refresh(request);
     }
 
 }

@@ -1,7 +1,7 @@
 package com.example.ledgerlift.features.chaincode;
 
-import org.springframework.stereotype.Service;
+public interface ChaincodeService {
 
-@Service
-public class ChaincodeService {
+
+
 }

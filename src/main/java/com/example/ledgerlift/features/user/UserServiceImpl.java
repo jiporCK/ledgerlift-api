@@ -53,4 +53,19 @@ public class UserServiceImpl implements UserService {
         return userMapper.toUserResponses(users);
     }
 
+    @Override
+    public UserResponse getUserByUuid(String uuid) {
+        return null;
+    }
+
+    @Override
+    public String disableUser(String uuid) {
+        return "";
+    }
+
+    @Override
+    public String enableUser(String uuid) {
+        return "";
+    }
+
 }
