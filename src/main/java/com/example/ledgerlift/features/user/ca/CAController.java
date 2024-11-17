@@ -17,7 +17,7 @@ public class CAController {
     private final CAService caService;
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@RequestBody CAEnrollmentRequest request) {
+    public ResponseEntity<?> registerUser(@RequestBody CAEnrollmentRequest request) throws Exception {
         try {
             caService.registerAndEnrollUser(request);
             return ResponseEntity.status(HttpStatus.CREATED)
