@@ -35,6 +35,8 @@ public class User extends Auditable {
 
     private Boolean isEmailVerified;
 
+    private Boolean isCAVerified;
+
     @OneToMany(mappedBy = "user")
     private List<Organization> organization;
 

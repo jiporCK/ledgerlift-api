@@ -1,4 +1,9 @@
 package com.example.ledgerlift.features.user.ca;
 
-public class CAService {
+import com.example.ledgerlift.features.user.ca.dto.CAEnrollmentRequest;
+
+public interface CAService {
+
+    public void registerAndEnrollUser(CAEnrollmentRequest request);
+
 }

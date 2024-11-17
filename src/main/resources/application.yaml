@@ -17,3 +17,27 @@ spring:
       hibernate:
         format_sql: true
 
+server:
+  port: 9191
+
+fabric:
+  wallet:
+    config-path: wallets
+  network:
+    channel: mychannel
+    discovery: true
+    config-path: ./fabric-samples/test-network/organizations/peerOrganizations/org1.example.com/connection-org1.json
+  ca:
+    admin:
+      username: admin
+      password: adminpw
+    org1:
+      name: Org1
+      mspId: Org1MSP
+      caUrl: "https://localhost:7054"
+      certificatePath: ./fabric-samples/test-network/organizations/fabric-ca/org1/ca-cert.pem
+    tls:
+      enabled: true
+
+
+

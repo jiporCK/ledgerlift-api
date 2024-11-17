@@ -41,6 +41,16 @@ dependencies {
 	// spring security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
+	// working with fabric-ca
+	implementation 'org.hyperledger.fabric:fabric-gateway-java:2.2.9'
+
+	// dependencies for grpc
+	implementation platform('com.google.protobuf:protobuf-bom:4.28.2')
+	implementation platform('io.grpc:grpc-bom:1.67.1')
+	compileOnly 'io.grpc:grpc-api'
+	runtimeOnly 'io.grpc:grpc-netty-shaded'
+	implementation 'com.google.code.gson:gson:2.11.0'
+
 	runtimeOnly 'org.postgresql:postgresql'
 }
 
