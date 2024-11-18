@@ -3,3 +3,7 @@ DB_PASSWORD: 1234
 DB_HOST: localhost
 DB_PORT: 5432
 DB_NAME: ledgerliftdb
+
+MEDIA_SERVER_PATH: src/main/resources/filestorage/idata-medias/
+MEDIA_BASE_URI=http: //localhost:8080/media
+MEDIA_CLIENT_PATH:  /media/**

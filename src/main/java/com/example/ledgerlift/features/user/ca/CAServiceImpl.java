@@ -83,7 +83,7 @@ public class CAServiceImpl implements CAService {
 
         // 1. Register
         RegistrationRequest registrationRequest = new RegistrationRequest(request.getUsername());
-        registrationRequest.setAffiliation(registrationRequest.getAffiliation());
+        registrationRequest.setAffiliation(request.getAffiliation());
         registrationRequest.setType("client");
         // auto generate the secret
         registrationRequest.setSecret(registrationRequest.getSecret());
@@ -91,7 +91,7 @@ public class CAServiceImpl implements CAService {
 
         Identity adminIdentity = wallet.get("admin");
         if (adminIdentity == null) {
-            throw new IllegalArgumentException("admin identity has not been found");
+            throw new IllegalArgumentException("Admin identity has not been found");
         }
 
         // 1.1 Get the registrar

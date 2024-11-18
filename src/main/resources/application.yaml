@@ -34,10 +34,13 @@ fabric:
     org1:
       name: Org1
       mspId: Org1MSP
-      caUrl: "https://localhost:7054"
+      caUrl: https://localhost:7054
       certificatePath: ./fabric-samples/test-network/organizations/fabric-ca/org1/ca-cert.pem
     tls:
       enabled: true
 
-
+media:
+  server-path: ${MEDIA_SERVER_PATH}
+  client-path: ${MEDIA_CLIENT_PATH}
+  base-uri: ${MEDIA_BASE_URI=http}
 

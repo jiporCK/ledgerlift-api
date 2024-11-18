@@ -12,6 +12,4 @@ public interface TokenService {
 
     String createRefreshToken(Authentication authentication);
 
-
-
 }
