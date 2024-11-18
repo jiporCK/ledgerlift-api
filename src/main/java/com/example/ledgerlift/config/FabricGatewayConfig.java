@@ -1,5 +1,6 @@
 package com.example.ledgerlift.config;
 
+import com.example.ledgerlift.features.user.ca.CAService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.Gateway;
@@ -17,6 +18,8 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 @RequiredArgsConstructor
 public class FabricGatewayConfig {
+
+    private final CAService caService;
 
     @Value("${fabric.wallet.config-path}")
     private String walletPath;
