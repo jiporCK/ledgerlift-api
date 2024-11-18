@@ -21,6 +21,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request
                             .requestMatchers("api/v1/enrollment/**").permitAll()
+                            .requestMatchers("api/v1/media/**").permitAll()
                             .anyRequest().authenticated();
                 });
 

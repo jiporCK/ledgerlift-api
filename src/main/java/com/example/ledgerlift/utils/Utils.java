@@ -9,7 +9,7 @@ public class Utils {
     }
 
     public static String extractExtension(String mediaName) {
-        return mediaName.substring(mediaName.lastIndexOf(".") + 1);
+        return mediaName.substring(mediaName.lastIndexOf("."));
     }
 
 }
