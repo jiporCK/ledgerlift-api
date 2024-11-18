@@ -40,7 +40,12 @@ fabric:
       enabled: true
 
 media:
-  server-path: ${MEDIA_SERVER_PATH}
+  server-path: ${MEDIA_SERVER_PATH} 
   client-path: ${MEDIA_CLIENT_PATH}
   base-uri: ${MEDIA_BASE_URI=http}
 
+keys:
+  access-private-token: keys/access-private
+  access-public-token: keys/access-public
+  refresh-public-token: keys/refresh-public
+  refresh-private-token: keys/refresh-private

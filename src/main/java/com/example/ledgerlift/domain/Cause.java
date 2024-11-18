@@ -5,12 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @Table(name = "courses")
-public class Campaign{
+public class Cause {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,11 +20,19 @@ public class Campaign{
 
     private String image;
 
+    private String name;
+
     private String description;
 
     private Double goalAmount;
 
+    private Date startDate;
+
+    private Date endDate;
+
     private Boolean isCompleted;
+
+    private String blockchainId;
 
     @ManyToOne
     private Organization organization;

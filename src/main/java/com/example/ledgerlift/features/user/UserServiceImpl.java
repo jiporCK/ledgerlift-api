@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
                     "No users found");
         }
 
-        return userMapper.toUserResponses(users);
+        return userMapper.toUserResponseList(users);
     }
 
     @Override

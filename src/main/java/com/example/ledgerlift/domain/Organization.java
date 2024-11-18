@@ -22,12 +22,20 @@ public class Organization extends Auditable {
 
     private String name;
 
+    private String email;
+
+    private String phone;
+
+    private String address;
+
     private String description;
+
+    private String blockchainId;
 
     @ManyToOne
     private User user;
 
     @OneToMany(mappedBy = "organization")
-    private List<Campaign> campaigns;
+    private List<Cause> causes;
 
 }

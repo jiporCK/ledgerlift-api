@@ -12,6 +12,8 @@ public interface UserMapper {
 
     User fromUserCreateRequest(UserCreateRequest userCreateRequest);
 
-    List<UserResponse> toUserResponses(List<User> users);
+    List<UserResponse> toUserResponseList(List<User> users);
+
+    UserResponse toUserResponse(User user);
 
 }

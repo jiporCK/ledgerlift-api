@@ -37,6 +37,31 @@ public class User extends Auditable {
 
     private Boolean isCAVerified;
 
+    /**
+     * Indicates whether the user's account is expired.
+     */
+    private boolean isAccountNonExpired;
+
+    /**
+     * Indicates whether the user's account is locked.
+     */
+    private boolean isAccountNonLocked;
+
+    /**
+     * Indicates whether the user's credentials are expired.
+     */
+    private boolean isCredentialsNonExpired;
+
+    /**
+     * Indicates whether the user's account is blocked.
+     */
+    private Boolean isBlocked;
+
+    /**
+     * Indicates whether the user's account is deleted.
+     */
+    private boolean isDeleted;
+
     @OneToMany(mappedBy = "user")
     private List<Organization> organizations;
 

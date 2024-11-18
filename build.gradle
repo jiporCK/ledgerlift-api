@@ -40,6 +40,7 @@ dependencies {
 
 	// spring security
 	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
 	// working with fabric-ca
 	implementation 'org.hyperledger.fabric:fabric-gateway-java:2.2.9'
