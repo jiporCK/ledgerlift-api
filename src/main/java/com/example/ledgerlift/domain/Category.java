@@ -23,6 +23,6 @@ public class Category {
     private String description;
 
     @OneToMany(mappedBy = "category")
-    private List<Course> courses;
+    private List<Campaign> courses;
 
 }

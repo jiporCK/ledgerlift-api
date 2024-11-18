@@ -28,6 +28,6 @@ public class Organization extends Auditable {
     private User user;
 
     @OneToMany(mappedBy = "organization")
-    private List<Course> courses;
+    private List<Campaign> courses;
 
 }
