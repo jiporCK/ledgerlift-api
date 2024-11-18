@@ -38,7 +38,7 @@ public class User extends Auditable {
     private Boolean isCAVerified;
 
     @OneToMany(mappedBy = "user")
-    private List<Organization> organization;
+    private List<Organization> organizations;
 
     @ManyToMany
     private List<Role> roles;
