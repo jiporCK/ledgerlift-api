@@ -32,8 +32,6 @@ public class Cause {
 
     private Boolean isCompleted;
 
-    private String blockchainId;
-
     @ManyToOne
     private Organization organization;
 

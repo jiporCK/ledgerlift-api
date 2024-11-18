@@ -30,8 +30,6 @@ public class Organization extends Auditable {
 
     private String description;
 
-    private String blockchainId;
-
     @ManyToOne
     private User user;
 
