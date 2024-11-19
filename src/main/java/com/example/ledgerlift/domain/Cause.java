@@ -1,23 +1,27 @@
 package com.example.ledgerlift.domain;
 
+import com.google.type.DateTime;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "courses")
+@Table(name = "causes")
 public class Cause {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String uuid;
 
     private String image;
 
@@ -27,11 +31,11 @@ public class Cause {
 
     private BigDecimal goalAmount;
 
-    private BigDecimal collectedAmount;
+    private BigDecimal currentAmount;
 
-    private Date startDate;
+    private LocalDateTime startDate;
 
-    private Date endDate;
+    private LocalDateTime endDate;
 
     private Boolean isCompleted;
 

@@ -2,8 +2,6 @@ package com.example.ledgerlift.features.user.userdto;
 
 public record UserResponse(
 
-        Long id,
-
         String uuid,
 
         String username,

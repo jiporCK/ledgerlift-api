@@ -20,6 +20,8 @@ public class Organization extends Auditable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String uuid;
+
     private String name;
 
     private String email;
