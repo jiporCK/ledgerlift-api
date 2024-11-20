@@ -55,6 +55,7 @@ public class SecurityConfig {
                                     "/swagger-ui/**",           // Default Swagger UI assets
                                     "/ledgeraiser-api-ui.html"  // Custom Swagger UI
                             ).permitAll()
+                            .requestMatchers("api/v1/auth/**").permitAll()
                             .requestMatchers("api/v1/users/**").permitAll()
                             .requestMatchers("api/v1/enrollment/**").permitAll()
                             .requestMatchers("api/v1/media/**").permitAll()

@@ -26,9 +26,10 @@ import java.util.stream.Collectors;
 public class TokenServiceImpl implements TokenService{
 
     private final JwtEncoder jwtEncoder;
-    private JwtEncoder refreshJwtEncoder;
     private final UserMapper userMapper;
 
+    @Qualifier("refreshJwtEncoder")
+    private JwtEncoder refreshJwtEncoder;
 
     @Qualifier("refreshJwtEncoder")
     @Autowired

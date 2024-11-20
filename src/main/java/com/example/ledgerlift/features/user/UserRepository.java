@@ -15,12 +15,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUuid(String userUuid);
 
-    @Modifying
-    @Query("UPDATE User as u SET u.isBlocked = TRUE where u.uuid = ?1")
-    void blockUser(String uuid);
-
-    @Modifying
-    @Query("UPDATE User as u SET u.isBlocked = FALSE where u.uuid = ?1")
-    void unblockUser(String uuid);
+//    @Modifying
+//    @Query("UPDATE User as u SET u.isDeleted = TRUE WHERE u.uuid = ?1")
+//    void disableByUuid(String uuid);
+//
+//    @Modifying
+//    @Query("UPDATE User as u SET u.isDeleted = FALSE WHERE u.uuid = ?1")
+//    void enableByUuid(String uuid);
 
 }
