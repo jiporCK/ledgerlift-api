@@ -1,12 +1,9 @@
 package com.example.ledgerlift.features.user;
 
-import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.user.userdto.UserCreateRequest;
 import com.example.ledgerlift.features.user.userdto.UserResponse;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

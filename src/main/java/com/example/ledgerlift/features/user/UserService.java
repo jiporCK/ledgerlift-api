@@ -1,5 +1,6 @@
 package com.example.ledgerlift.features.user;
 
+import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.features.user.userdto.UserCreateRequest;
 import com.example.ledgerlift.features.user.userdto.UserResponse;
 
@@ -13,8 +14,10 @@ public interface UserService {
 
     UserResponse getUserByUuid(String uuid);
 
-    String disableUser(String uuid);
+    BasedMessage blockUser(String uuid);
 
-    String enableUser(String uuid);
+    BasedMessage unblockUser(String uuid);
+
+    BasedMessage uploadProfile(String uuid, String profile);
 
 }

@@ -53,7 +53,7 @@ public class User extends Auditable {
     private boolean isCredentialsNonExpired;
 
     /**
-     * Indicates whether the user's account is blocked.
+     * Indicates whether the user's account is bloStringcked.
      */
     private Boolean isBlocked;
 

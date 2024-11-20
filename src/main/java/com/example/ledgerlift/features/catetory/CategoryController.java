@@ -22,9 +22,9 @@ public class CategoryController {
     }
 
     @GetMapping
-    public CategoryResponse getCategory(@RequestParam String categoryName) {
+    public CategoryResponse getCategory(@RequestParam String name) {
 
-        return categoryService.getCategoryByName(categoryName);
+        return categoryService.getCategoryByName(name);
 
     }
 

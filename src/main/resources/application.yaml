@@ -49,3 +49,11 @@ keys:
   access-public-token: keys/access-public
   refresh-public-token: keys/refresh-public
   refresh-private-token: keys/refresh-private
+
+springdoc:
+  swagger-ui:
+    path: /ledgeraiser-api-ui.html
+    url: /ledgeraiser-api-docs
+  api-docs:
+    path: /ledgeraiser-api-docs
+

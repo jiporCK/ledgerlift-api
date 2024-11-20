@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -57,13 +55,22 @@ public class CauseServiceImpl implements CauseService {
         cause.setOrganization(organization);
         cause.setCategory(category);
 
-        categoryRepository.save(category);
+        causeRepository.save(cause);
 
     }
 
     @Override
     public CauseResponse getCauseByUuid(String uuid) {
-        return null;
+
+        Cause cause = causeRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.NOT_FOUND,
+                                "Cause has not been found!"
+                        )
+                );
+
+        return causeMapper.toCauseResponse(cause);
     }
 
     @Override

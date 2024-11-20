@@ -1,14 +1,11 @@
 package com.example.ledgerlift.domain;
 
-import com.google.type.DateTime;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter

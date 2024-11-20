@@ -4,6 +4,7 @@ import com.example.ledgerlift.domain.Category;
 import com.example.ledgerlift.features.catetory.dto.CategoryRequest;
 import com.example.ledgerlift.features.catetory.dto.CategoryResponse;
 import com.example.ledgerlift.mapper.CategoryMapper;
+import com.example.ledgerlift.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
             );
         }
 
+        category.setUuid(Utils.generateUuid());
+
         repository.save(category);
 
     }
@@ -37,12 +40,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse getCategoryByName(String categoryName) {
 
-        Category category = repository.findByNameContaining(categoryName)
-                .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.NOT_FOUND
-                        )
-                );
+        Category category = repository.findByNameContainsIgnoreCase(categoryName);
 
         return mapper.toCategoryResponse(category);
     }

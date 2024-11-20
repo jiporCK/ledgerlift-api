@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,6 +26,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.lang.reflect.Method;
 import java.util.UUID;
 
 @Configuration
@@ -47,8 +49,19 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(request -> {
                     request
+                            .requestMatchers(
+                                    "/ledgeraiser-api-docs/**",  // OpenAPI docs
+                                    "/v3/api-docs/**",          // Default API docs path
+                                    "/swagger-ui/**",           // Default Swagger UI assets
+                                    "/ledgeraiser-api-ui.html"  // Custom Swagger UI
+                            ).permitAll()
+                            .requestMatchers("api/v1/users/**").permitAll()
                             .requestMatchers("api/v1/enrollment/**").permitAll()
                             .requestMatchers("api/v1/media/**").permitAll()
+                            .requestMatchers("api/v1/organizations/**").permitAll()
+                            .requestMatchers("api/v1/causes/**").permitAll()
+                            .requestMatchers(HttpMethod.GET,"api/v1/categories/**").permitAll()
+                            .requestMatchers(HttpMethod.POST,"api/v1/categories/**").permitAll()
                             .anyRequest().authenticated();
                 });
 
