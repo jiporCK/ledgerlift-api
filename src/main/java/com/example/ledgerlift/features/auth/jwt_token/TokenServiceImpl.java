@@ -3,6 +3,7 @@ package com.example.ledgerlift.features.auth.jwt_token;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.auth.dto.AuthResponse;
 import com.example.ledgerlift.mapper.UserMapper;
+import com.example.ledgerlift.security.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,13 +18,15 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class TokenServiceImpl implements TokenService{
+public class TokenServiceImpl implements TokenService {
 
     private final JwtEncoder jwtEncoder;
     private final UserMapper userMapper;
@@ -37,10 +40,9 @@ public class TokenServiceImpl implements TokenService{
         this.refreshJwtEncoder = refreshJwtEncoder;
     }
 
-    private final String TOKEN_TYPE = "Bearer";
-
     @Override
     public AuthResponse createToken(User user, Authentication authentication) {
+        final String TOKEN_TYPE = "Bearer";
         return new AuthResponse(
                 TOKEN_TYPE,
                 createAccessToken(authentication),
@@ -66,7 +68,21 @@ public class TokenServiceImpl implements TokenService{
 
         log.info("Scope: {}", scope);
 
+        String uuid = "";
+
+        if (authentication.getPrincipal() instanceof CustomUserDetails customUserDetails) {
+            uuid = customUserDetails.getUuid();
+        } else if (authentication.getPrincipal() instanceof Jwt jwt) {
+            uuid = jwt.getClaimAsString("uuid");
+        } else {
+            log.error("Principal is of type: {}", authentication.getPrincipal().getClass().getName());
+            throw new IllegalStateException("Principal is not of type CustomUserDetails or Jwt");
+        }
+
         Instant now = Instant.now();
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("uuid", uuid);
 
         JwtClaimsSet jwtClaimsSet = JwtClaimsSet.builder()
                 .id(authentication.getName())
@@ -76,6 +92,7 @@ public class TokenServiceImpl implements TokenService{
                 .expiresAt(now.plus(5, ChronoUnit.MINUTES))
                 .issuer(authentication.getName())
                 .claim("scope", scope)
+                .claims(claim -> claim.putAll(claims))
                 .build();
         return jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
 
@@ -96,7 +113,20 @@ public class TokenServiceImpl implements TokenService{
                     .collect(Collectors.joining(" "));
         }
 
+        String uuid;
+        if (auth.getPrincipal() instanceof CustomUserDetails customUserDetails) {
+            uuid = customUserDetails.getUuid();
+        } else if (auth.getPrincipal() instanceof Jwt jwt) {
+            uuid = jwt.getClaimAsString("uuid");
+        } else {
+            log.error("Principal is of type: {}", auth.getPrincipal().getClass().getName());
+            throw new IllegalStateException("Principal is not of type CustomUserDetails or Jwt");
+        }
+
         Instant now = Instant.now();
+
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("uuid", uuid);
 
         JwtClaimsSet refreshJwtClaimsSet = JwtClaimsSet.builder()
                 .id(auth.getName())
@@ -106,6 +136,7 @@ public class TokenServiceImpl implements TokenService{
                 .expiresAt(now.plus(1, ChronoUnit.DAYS))
                 .issuer(auth.getName())
                 .claim("scope", scope)
+                .claims(claim -> claim.putAll(claims))
                 .build();
 
         return refreshJwtEncoder.encode(JwtEncoderParameters.from(refreshJwtClaimsSet)).getTokenValue();

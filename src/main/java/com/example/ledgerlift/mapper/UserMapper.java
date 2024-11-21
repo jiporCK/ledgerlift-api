@@ -1,20 +1,20 @@
 package com.example.ledgerlift.mapper;
 
 import com.example.ledgerlift.domain.User;
-import com.example.ledgerlift.features.user.userdto.UserCreateRequest;
-import com.example.ledgerlift.features.user.userdto.UserResponse;
+import com.example.ledgerlift.features.user.dto.RegistrationRequest;
+import com.example.ledgerlift.features.user.dto.UserResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
-    User fromUserCreateRequest(UserCreateRequest userCreateRequest);
+    User fromUserCreateRequest(RegistrationRequest registrationRequest);
 
     List<UserResponse> toUserResponseList(List<User> users);
 
     UserResponse toUserResponse(User user);
 
+    User fromUserResponse(UserResponse response);
 }

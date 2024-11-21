@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -25,8 +26,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 @Configuration
@@ -39,8 +38,18 @@ public class SecurityConfig {
     private final KeyUtil keyUtil;
 
     @Bean
-    JwtAuthenticationProvider jwtAuthenticationProvider(@Qualifier("refreshJwtDecoder") JwtDecoder refreshJwtDecoder) {
+    JwtAuthenticationProvider jwtAuthenticationProvider(@Qualifier("refreshJwtDecoder")JwtDecoder refreshJwtDecoder) {
         JwtAuthenticationProvider provider = new JwtAuthenticationProvider(refreshJwtDecoder);
+        return provider;
+    }
+
+    @Bean
+    DaoAuthenticationProvider daoAuthenticationProvider(){
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(userDetailsService);
+
         return provider;
     }
 
@@ -49,13 +58,14 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(request -> {
                     request
+                            .requestMatchers(HttpMethod.POST, "api/v1/users/**").permitAll()
                             .requestMatchers(
                                     "/ledgeraiser-api-docs/**",  // OpenAPI docs
                                     "/v3/api-docs/**",          // Default API docs path
                                     "/swagger-ui/**",           // Default Swagger UI assets
                                     "/ledgeraiser-api-ui.html"  // Custom Swagger UI
                             ).permitAll()
-                            .requestMatchers("api/v1/auth/**").permitAll()
+                            .requestMatchers(HttpMethod.POST, "api/v1/auth/**").permitAll()
                             .requestMatchers("api/v1/users/**").permitAll()
                             .requestMatchers("api/v1/enrollment/**").permitAll()
                             .requestMatchers("api/v1/media/**").permitAll()
@@ -86,8 +96,9 @@ public class SecurityConfig {
                 .privateKey(keyUtil.getAccessTokenPrivateKey())
                 .keyID(UUID.randomUUID().toString())
                 .build();
-        JWKSet jwtSet = new JWKSet(rsaKey);
-        return ((jwkSelector, securityContext) -> jwkSelector.select(jwtSet));
+        JWKSet jwkSet = new JWKSet(rsaKey);
+        return (jwkSelector, securityContext) -> jwkSelector
+                .select(jwkSet);
     }
 
     @Primary
@@ -104,7 +115,7 @@ public class SecurityConfig {
                 .build();
     }
 
-    // JWT REFRESH TOKEN =========================================
+    // JWT REFRESH TOKEN =====================================
 
     @Bean("refreshJwkSource")
     JWKSource<SecurityContext> refreshJwkSource() {
@@ -112,8 +123,9 @@ public class SecurityConfig {
                 .privateKey(keyUtil.getRefreshTokenPrivateKey())
                 .keyID(UUID.randomUUID().toString())
                 .build();
-        JWKSet jwtSet = new JWKSet(rsaKey);
-        return ((jwkSelector, securityContext) -> jwkSelector.select(jwtSet));
+        JWKSet jwkSet = new JWKSet(rsaKey);
+        return (jwkSelector, securityContext) -> jwkSelector
+                .select(jwkSet);
     }
 
     @Bean("refreshJwtEncoder")
@@ -121,7 +133,7 @@ public class SecurityConfig {
         return new NimbusJwtEncoder(jwkSource);
     }
 
-    @Bean
+    @Bean("refreshJwtDecoder")
     JwtDecoder refreshJwtDecoder() throws JOSEException {
         return NimbusJwtDecoder
                 .withPublicKey(keyUtil.getRefreshTokenPublicKey())

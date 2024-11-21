@@ -1,10 +1,10 @@
-package com.example.ledgerlift.features.cause.dto;
+package com.example.ledgerlift.features.event.dto;
 
 import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
 
 import java.math.BigDecimal;
 
-public record CauseResponse(
+public record EventResponse(
 
         String uuid,
 

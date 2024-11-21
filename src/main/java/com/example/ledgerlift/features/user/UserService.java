@@ -1,23 +1,28 @@
 package com.example.ledgerlift.features.user;
 
 import com.example.ledgerlift.base.BasedMessage;
-import com.example.ledgerlift.features.user.userdto.UserCreateRequest;
-import com.example.ledgerlift.features.user.userdto.UserResponse;
+import com.example.ledgerlift.domain.User;
+import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
+import com.example.ledgerlift.features.user.dto.RegistrationRequest;
+import com.example.ledgerlift.features.user.dto.UserResponse;
 
 import java.util.List;
 
 public interface UserService {
 
-    String createUser(UserCreateRequest request);
+    UserResponse createUser(RegistrationRequest request);
 
     List<UserResponse> getAllUsers();
 
     UserResponse getUserByUuid(String uuid);
 
-    BasedMessage blockUser(String uuid);
-
-    BasedMessage unblockUser(String uuid);
+//    BasedMessage enableByUuid(String uuid);
+//
+//    BasedMessage disableByUuid(String uuid);
 
     BasedMessage uploadProfile(String uuid, String profile);
 
+    String validateVerificationToken(String token);
+
+    void saveUserVerificationToken(User theUser, String verificationToken, VerificationToken.TokenType tokenType);
 }

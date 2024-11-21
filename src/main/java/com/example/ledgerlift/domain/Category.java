@@ -25,6 +25,6 @@ public class Category {
     private String description;
 
     @OneToMany(mappedBy = "category")
-    private List<Cause> causes;
+    private List<Event> events;
 
 }

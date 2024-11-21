@@ -1,6 +1,6 @@
 package com.example.ledgerlift.features.auth.dto;
 
-import com.example.ledgerlift.features.user.userdto.UserResponse;
+import com.example.ledgerlift.features.user.dto.UserResponse;
 
 public record AuthResponse(
 

@@ -1,6 +1,6 @@
-package com.example.ledgerlift.features.cause;
+package com.example.ledgerlift.features.event;
 
-import com.example.ledgerlift.features.cause.dto.CauseRequest;
+import com.example.ledgerlift.features.event.dto.EventRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -8,17 +8,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/causes")
-public class CauseController {
+public class EventController {
 
-    private final CauseService causeService;
+    private final EventService eventService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{organizationUuid}/{categoryUuid}")
     public void createCause(@PathVariable String organizationUuid,
                             @PathVariable String categoryUuid,
-                            @RequestBody CauseRequest request) {
+                            @RequestBody EventRequest request) {
 
-        causeService.createCause(organizationUuid, categoryUuid, request);
+        eventService.createEvent(organizationUuid, categoryUuid, request);
 
     }
 

@@ -1,8 +1,8 @@
-package com.example.ledgerlift.features.cause.dto;
+package com.example.ledgerlift.features.event.dto;
 
 import java.math.BigDecimal;
 
-public record CauseRequest(
+public record EventRequest(
 
         String name,
 

@@ -17,6 +17,26 @@ spring:
       hibernate:
         format_sql: true
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_USERNAME}
+    password: ${GMAIL_PASSWORD}
+    senderName: ${EMAIL_SENDER}
+    default-encoding: UTF-8
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            required: true
+            enable: true
+
+logging:
+  level:
+    org.springframework.mail: DEBUG
+
 server:
   port: 8080
 

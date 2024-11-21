@@ -1,31 +1,119 @@
-package com.example.ledgerlift.features.user;
+    package com.example.ledgerlift.features.user;
 
-import com.example.ledgerlift.features.user.userdto.UserCreateRequest;
-import com.example.ledgerlift.features.user.userdto.UserResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+    import com.example.ledgerlift.base.BasedMessage;
+    import com.example.ledgerlift.domain.Role;
+    import com.example.ledgerlift.domain.User;
+    import com.example.ledgerlift.event.RegistrationCompleteEvent;
+    import com.example.ledgerlift.features.mail.MailService;
+    import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
+    import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
+    import com.example.ledgerlift.features.user.dto.RegistrationRequest;
+    import com.example.ledgerlift.features.user.dto.RegistrationResponse;
+    import com.example.ledgerlift.features.user.dto.UserResponse;
+    import com.example.ledgerlift.init.RoleRepository;
+    import com.example.ledgerlift.mapper.UserMapper;
+    import com.example.ledgerlift.utils.Utils;
+    import jakarta.servlet.http.HttpServletRequest;
+    import lombok.RequiredArgsConstructor;
+    import lombok.extern.slf4j.Slf4j;
+    import okhttp3.Response;
+    import org.springframework.context.ApplicationEventPublisher;
+    import org.springframework.http.HttpStatus;
+    import org.springframework.web.bind.annotation.*;
+    import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
+    import java.time.LocalDateTime;
+    import java.util.ArrayList;
+    import java.util.List;
 
-@RestController
-@RequestMapping("/api/v1/users")
-@RequiredArgsConstructor
-public class UserController {
+    @RestController
+    @RequestMapping("/api/v1/users")
+    @RequiredArgsConstructor
+    @Slf4j
+    public class UserController {
 
-    private final UserService userService;
+        private final UserService userService;
+        private final UserMapper userMapper;
+        private final MailService mailService;
+        private final RoleRepository roleRepository;
+        private final UserRepository userRepository;
+        private final ApplicationEventPublisher eventPublisher;
+        private final VerificationTokenRepository verificationTokenRepository;
 
-    @PostMapping
-    public ResponseEntity<?> createUser(@RequestBody UserCreateRequest request) {
+        @PostMapping("/user-registration")
+        public RegistrationResponse createUser(@RequestBody RegistrationRequest request, final HttpServletRequest servletRequest) {
 
-        return ResponseEntity.ok()
-                .body(userService.createUser(request));
+            UserResponse response = userService.createUser(request);
+            User user = userMapper.fromUserResponse(response);
+
+            List<Role> roles = new ArrayList<>();
+            Role role = roleRepository.findByName("DONOR");
+            roles.add(role);
+
+            user.setRoles(roles);
+            user.setCreatedAt(LocalDateTime.now());
+            user.setAccountNonExpired(true);
+            user.setAccountNonLocked(true);
+            user.setCredentialsNonExpired(true);
+            user.setDeleted(false);
+            user.setIsBlocked(false);
+
+            userRepository.save(user);
+
+            VerificationToken token = new VerificationToken(Utils.generateDigitsToken(), VerificationToken.TokenType.EMAIL_VERIFICATION);
+            token.setUser(user);
+            verificationTokenRepository.save(token);
+
+            user.setTokens(new ArrayList<>(List.of(token)));
+            userRepository.save(user);
+
+            log.info("User: {}", user);
+
+            VerificationToken verificationToken = verificationTokenRepository.findByUser(user)
+                    .orElseThrow(
+                            () -> new IllegalStateException("Verification token not found")
+                    );
+
+            eventPublisher.publishEvent(new RegistrationCompleteEvent(user, Utils.getApplicationUrl(servletRequest)));
+
+            return RegistrationResponse.builder()
+                    .message("Registration successfully")
+                    .user(userMapper.toUserResponse(user))
+                    .code(200)
+                    .status(true)
+                    .timeStamp(LocalDateTime.parse(LocalDateTime.now().toString()))
+                    .data(request.email())
+                    .token(verificationToken.getToken())
+                    .build();
+
+        }
+
+        @PostMapping("/verify-email")
+        public BasedMessage verifyEmail(@RequestParam String token, final HttpServletRequest servletRequest) {
+
+            VerificationToken verificationToken = verificationTokenRepository.findByTokenAndType(token, VerificationToken.TokenType.EMAIL_VERIFICATION)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Token has not been found"));
+
+            User user = verificationToken.getUser();
+
+            String validatedToken = userService.validateVerificationToken(verificationToken.getToken());
+
+            if (validatedToken.equals("valid")) {
+                user.setIsEmailVerified(true);
+                userRepository.save(user);
+                return BasedMessage.builder()
+                        .message("Account verified successfully. Please login")
+                        .build();
+            }
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "Token has not been found"
+            );
+        }
+
+        @GetMapping
+        public List<UserResponse> getAllUsers() {
+            return userService.getAllUsers();
+        }
 
     }
-
-    @GetMapping
-    public List<UserResponse> getAllUsers() {
-        return userService.getAllUsers();
-    }
-
-}

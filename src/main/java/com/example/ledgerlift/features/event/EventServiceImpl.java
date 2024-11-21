@@ -1,13 +1,13 @@
-package com.example.ledgerlift.features.cause;
+package com.example.ledgerlift.features.event;
 
 import com.example.ledgerlift.domain.Category;
-import com.example.ledgerlift.domain.Cause;
+import com.example.ledgerlift.domain.Event;
 import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.features.catetory.CategoryRepository;
-import com.example.ledgerlift.features.cause.dto.CauseRequest;
-import com.example.ledgerlift.features.cause.dto.CauseResponse;
+import com.example.ledgerlift.features.event.dto.EventRequest;
+import com.example.ledgerlift.features.event.dto.EventResponse;
 import com.example.ledgerlift.features.organization.OrganizationRepository;
-import com.example.ledgerlift.mapper.CauseMapper;
+import com.example.ledgerlift.mapper.EventMapper;
 import com.example.ledgerlift.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,16 +20,16 @@ import java.util.List;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class CauseServiceImpl implements CauseService {
+public class EventServiceImpl implements EventService {
 
-    private final CauseRepository causeRepository;
+    private final EventRepository EventRepository;
     private final OrganizationRepository organizationRepository;
     private final CategoryRepository categoryRepository;
 
-    private final CauseMapper causeMapper;
+    private final EventMapper eventMapper;
 
     @Override
-    public void createCause(String organizationUuid, String categoryUuid, CauseRequest causeRequest) {
+    public void createEvent(String organizationUuid, String categoryUuid, EventRequest request) {
 
         Organization organization = organizationRepository.findByUuid(organizationUuid)
                 .orElseThrow(
@@ -47,44 +47,44 @@ public class CauseServiceImpl implements CauseService {
                         )
                 );
 
-        Cause cause = causeMapper.fromCauseCreateRequest(causeRequest);
-        cause.setUuid(Utils.generateUuid());
-        cause.setStartDate(LocalDateTime.now());
-        cause.setEndDate(LocalDateTime.now().plusMonths(1));
-        cause.setIsCompleted(false);
-        cause.setOrganization(organization);
-        cause.setCategory(category);
+        Event event = eventMapper.fromEventCreateRequest(request);
+        event.setUuid(Utils.generateUuid());
+        event.setStartDate(LocalDateTime.now());
+        event.setEndDate(LocalDateTime.now().plusMonths(1));
+        event.setIsCompleted(false);
+        event.setOrganization(organization);
+        event.setCategory(category);
 
-        causeRepository.save(cause);
+        EventRepository.save(event);
 
     }
 
     @Override
-    public CauseResponse getCauseByUuid(String uuid) {
+    public EventResponse getEventByUuid(String uuid) {
 
-        Cause cause = causeRepository.findByUuid(uuid)
+        Event event = EventRepository.findByUuid(uuid)
                 .orElseThrow(
                         () -> new ResponseStatusException(
                                 HttpStatus.NOT_FOUND,
-                                "Cause has not been found!"
+                                "Event has not been found!"
                         )
                 );
 
-        return causeMapper.toCauseResponse(cause);
+        return eventMapper.toEventResponse(event);
     }
 
     @Override
-    public List<CauseResponse> getAllCauses() {
+    public List<EventResponse> getAllEvents() {
         return List.of();
     }
 
     @Override
-    public void deleteCauseByUuid(String uuid) {
+    public void deleteEventByUuid(String uuid) {
 
     }
 
     @Override
-    public void updateCauseByUuid(String uuid, CauseRequest causeRequest) {
+    public void updateEventByUuid(String uuid, EventRequest EventRequest) {
 
     }
 }

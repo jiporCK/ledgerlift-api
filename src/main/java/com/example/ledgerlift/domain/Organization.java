@@ -32,10 +32,12 @@ public class Organization extends Auditable {
 
     private String description;
 
+    private String moneyQRCode;
+
     @ManyToOne
     private User user;
 
     @OneToMany(mappedBy = "organization")
-    private List<Cause> causes;
+    private List<Event> events;
 
 }

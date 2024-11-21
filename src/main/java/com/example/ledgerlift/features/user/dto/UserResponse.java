@@ -1,4 +1,4 @@
-package com.example.ledgerlift.features.user.userdto;
+package com.example.ledgerlift.features.user.dto;
 
 public record UserResponse(
 

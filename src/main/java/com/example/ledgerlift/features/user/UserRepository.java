@@ -13,7 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByEmail(String email);
 
-    Optional<User> findByUuid(String userUuid);
+    Optional<User> findByUuid(String uuid);
 
 //    @Modifying
 //    @Query("UPDATE User as u SET u.isDeleted = TRUE WHERE u.uuid = ?1")
@@ -23,4 +23,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 //    @Query("UPDATE User as u SET u.isDeleted = FALSE WHERE u.uuid = ?1")
 //    void enableByUuid(String uuid);
 
+    boolean existsByUuid(String uuid);
 }

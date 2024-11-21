@@ -1,6 +1,7 @@
 package com.example.ledgerlift.domain;
 
 import com.example.ledgerlift.domain.audit.Auditable;
+import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +36,9 @@ public class User extends Auditable {
 
     private Boolean isEmailVerified;
 
-    private Boolean isCAVerified;
+    private Boolean isAccountVerified;
+
+    private Boolean isAnonymous;
 
     /**
      * Indicates whether the user's account is expired.
@@ -67,5 +70,8 @@ public class User extends Auditable {
 
     @ManyToMany
     private List<Role> roles;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VerificationToken> tokens;
 
 }
