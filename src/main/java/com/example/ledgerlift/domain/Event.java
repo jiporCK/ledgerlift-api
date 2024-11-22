@@ -36,6 +36,8 @@ public class Event {
 
     private Boolean isCompleted;
 
+    private Boolean isVisible;
+
     @ManyToOne
     private Organization organization;
 

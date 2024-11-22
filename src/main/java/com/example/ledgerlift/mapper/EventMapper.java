@@ -6,6 +6,8 @@ import com.example.ledgerlift.features.event.dto.EventResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
@@ -14,4 +16,5 @@ public interface EventMapper {
     @Mapping(source = "organization", target = "organization")
     EventResponse toEventResponse(Event event);
 
+    List<EventResponse> toEventResponseList(List<Event> events);
 }

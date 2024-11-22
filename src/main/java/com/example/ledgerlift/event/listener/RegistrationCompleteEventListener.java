@@ -5,6 +5,7 @@ import com.example.ledgerlift.event.RegistrationCompleteEvent;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.user.UserService;
+import com.example.ledgerlift.utils.MailUtils;
 import com.example.ledgerlift.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         User theUser = event.getUser();
 
         // 2. Create a verification token for the user
-        String verificationToken = Utils.generateDigitsToken();
+        String verificationToken = MailUtils.generateDigitsToken();
 
         // 3. Save the verification token for the user
         userService.saveUserVerificationToken(theUser, verificationToken, VerificationToken.TokenType.EMAIL_VERIFICATION);
@@ -34,7 +35,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
         String url = event.getApplicationUrl() + "/api/v1/register/verify-email?token=" + verificationToken;
 
         // 5. Send the email
-        mailService.sendTokenForEmailVerification(url, theUser, verificationToken);
+        mailService.sendTokenForEmailVerification(theUser, verificationToken);
 
         log.info("Click the link to verify your registration: {}", url);
     }

@@ -9,6 +9,7 @@ import com.example.ledgerlift.features.event.dto.EventResponse;
 import com.example.ledgerlift.features.organization.OrganizationRepository;
 import com.example.ledgerlift.mapper.EventMapper;
 import com.example.ledgerlift.utils.Utils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,7 @@ public class EventServiceImpl implements EventService {
     private final CategoryRepository categoryRepository;
 
     private final EventMapper eventMapper;
+    private final EventRepository eventRepository;
 
     @Override
     public void createEvent(String organizationUuid, String categoryUuid, EventRequest request) {
@@ -87,4 +89,54 @@ public class EventServiceImpl implements EventService {
     public void updateEventByUuid(String uuid, EventRequest EventRequest) {
 
     }
+
+    @Override
+    public List<EventResponse> getEventsByCategory(String uuid) {
+
+        Category category = categoryRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Category has not been found!"
+                        )
+                );
+
+        List<Event> events = eventRepository.findAllByCategory(category);
+
+        return eventMapper.toEventResponseList(events);
+    }
+
+    @Override
+    public List<EventResponse> getEventsByOrganization(String organizationUuid) {
+
+        Organization organization = organizationRepository.findByUuid(organizationUuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Organization has not been found!"
+                        )
+                );
+
+        List<Event> events = eventRepository.findAllByOrganization(organization);
+
+        return eventMapper.toEventResponseList(events);
+    }
+
+    @Override
+    public void hideEventByUuid(String uuid) {
+
+        Event event = eventRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Event has not been found!"
+                        )
+                );
+
+        event.setIsVisible(true);
+
+        eventRepository.save(event);
+
+    }
+
 }

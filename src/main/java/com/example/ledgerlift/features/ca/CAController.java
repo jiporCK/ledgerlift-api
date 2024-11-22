@@ -1,6 +1,6 @@
-package com.example.ledgerlift.features.user.ca;
+package com.example.ledgerlift.features.ca;
 
-import com.example.ledgerlift.features.user.ca.dto.CAEnrollmentRequest;
+import com.example.ledgerlift.features.ca.dto.CAEnrollmentRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

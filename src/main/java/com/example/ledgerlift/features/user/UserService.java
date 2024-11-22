@@ -1,10 +1,10 @@
 package com.example.ledgerlift.features.user;
 
-import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.user.dto.RegistrationRequest;
 import com.example.ledgerlift.features.user.dto.UserResponse;
+import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
 
 import java.util.List;
 
@@ -16,13 +16,11 @@ public interface UserService {
 
     UserResponse getUserByUuid(String uuid);
 
-//    BasedMessage enableByUuid(String uuid);
-//
-//    BasedMessage disableByUuid(String uuid);
-
-    BasedMessage uploadProfile(String uuid, String profile);
+    void uploadProfile(String uuid, String profile);
 
     String validateVerificationToken(String token);
 
     void saveUserVerificationToken(User theUser, String verificationToken, VerificationToken.TokenType tokenType);
+
+    void updateUser(String uuid, UserUpdateRequest request);
 }

@@ -1,4 +1,4 @@
-package com.example.ledgerlift.features.user.ca.dto;
+package com.example.ledgerlift.features.ca.dto;
 
 import lombok.*;
 

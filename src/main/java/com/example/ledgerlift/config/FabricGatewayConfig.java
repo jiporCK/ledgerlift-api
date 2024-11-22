@@ -1,6 +1,6 @@
 package com.example.ledgerlift.config;
 
-import com.example.ledgerlift.features.user.ca.CAService;
+import com.example.ledgerlift.features.ca.CAService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.Gateway;

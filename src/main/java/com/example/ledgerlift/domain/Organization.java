@@ -40,4 +40,7 @@ public class Organization extends Auditable {
     @OneToMany(mappedBy = "organization")
     private List<Event> events;
 
+    @OneToMany(mappedBy = "organization")
+    private List<Receipt> receipts;
+
 }

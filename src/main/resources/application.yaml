@@ -77,3 +77,4 @@ springdoc:
   api-docs:
     path: /ledgeraiser-api-docs
 
+client-path: /login/verify-email

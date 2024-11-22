@@ -17,4 +17,10 @@ public interface EventService {
 
     void updateEventByUuid(String uuid, EventRequest eventRequest);
 
+    List<EventResponse> getEventsByCategory(String uuid);
+
+    List<EventResponse> getEventsByOrganization(String organizationUuid);
+
+    void hideEventByUuid(String uuid);
+
 }

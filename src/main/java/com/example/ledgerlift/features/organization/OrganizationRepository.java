@@ -9,7 +9,6 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
 
     Optional<Organization> findByUuid(String organizationUuid);
 
-
     boolean existsByName(String name);
 
     boolean existsByEmail(String email);

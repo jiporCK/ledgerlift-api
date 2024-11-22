@@ -2,6 +2,7 @@ package com.example.ledgerlift.features.organization;
 
 import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.domain.User;
+import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
 import com.example.ledgerlift.features.user.UserRepository;
@@ -23,6 +24,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
     private final OrganizationMapper organizationMapper;
+    private final MailService mailService;
 
     @Override
     public void createOrganization(String userUuid, OrganizationRequest request) {
@@ -48,6 +50,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         organization.setUser(user);
 
         organizationRepository.save(organization);
+        mailService.welcomeOrganization(organization);
 
     }
 
@@ -58,7 +61,10 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     @Override
     public List<OrganizationResponse> getAll() {
-        return List.of();
+
+        List<Organization> organizations = organizationRepository.findAll();
+
+        return organizationMapper.toOrganizationResponseList(organizations);
     }
 
     @Override

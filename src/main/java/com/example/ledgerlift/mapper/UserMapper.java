@@ -3,6 +3,7 @@ package com.example.ledgerlift.mapper;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.user.dto.RegistrationRequest;
 import com.example.ledgerlift.features.user.dto.UserResponse;
+import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
 import org.mapstruct.Mapper;
 
 import java.util.List;
@@ -17,4 +18,5 @@ public interface UserMapper {
     UserResponse toUserResponse(User user);
 
     User fromUserResponse(UserResponse response);
+
 }

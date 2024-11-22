@@ -6,6 +6,8 @@ import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface OrganizationMapper {
 
@@ -13,5 +15,8 @@ public interface OrganizationMapper {
 
     @Mapping(target = "user", source = "user")
     OrganizationResponse toOrganizationResponse(Organization organization);
+
+    @Mapping(target = "user", source = "user")
+    List<OrganizationResponse> toOrganizationResponseList(List<Organization> organizations);
 
 }

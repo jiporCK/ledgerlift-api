@@ -10,16 +10,18 @@
     import com.example.ledgerlift.features.user.dto.RegistrationRequest;
     import com.example.ledgerlift.features.user.dto.RegistrationResponse;
     import com.example.ledgerlift.features.user.dto.UserResponse;
+    import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
     import com.example.ledgerlift.init.RoleRepository;
     import com.example.ledgerlift.mapper.UserMapper;
+    import com.example.ledgerlift.utils.MailUtils;
     import com.example.ledgerlift.utils.Utils;
     import jakarta.servlet.http.HttpServletRequest;
     import lombok.RequiredArgsConstructor;
     import lombok.extern.slf4j.Slf4j;
-    import okhttp3.Response;
     import org.springframework.context.ApplicationEventPublisher;
     import org.springframework.http.HttpStatus;
     import org.springframework.web.bind.annotation.*;
+    import org.springframework.web.multipart.MultipartFile;
     import org.springframework.web.server.ResponseStatusException;
 
     import java.time.LocalDateTime;
@@ -41,7 +43,7 @@
         private final VerificationTokenRepository verificationTokenRepository;
 
         @PostMapping("/user-registration")
-        public RegistrationResponse createUser(@RequestBody RegistrationRequest request, final HttpServletRequest servletRequest) {
+        public BasedMessage createUser(@RequestBody RegistrationRequest request, final HttpServletRequest servletRequest) {
 
             UserResponse response = userService.createUser(request);
             User user = userMapper.fromUserResponse(response);
@@ -60,7 +62,7 @@
 
             userRepository.save(user);
 
-            VerificationToken token = new VerificationToken(Utils.generateDigitsToken(), VerificationToken.TokenType.EMAIL_VERIFICATION);
+            VerificationToken token = new VerificationToken(MailUtils.generateDigitsToken(), VerificationToken.TokenType.EMAIL_VERIFICATION);
             token.setUser(user);
             verificationTokenRepository.save(token);
 
@@ -69,27 +71,16 @@
 
             log.info("User: {}", user);
 
-            VerificationToken verificationToken = verificationTokenRepository.findByUser(user)
-                    .orElseThrow(
-                            () -> new IllegalStateException("Verification token not found")
-                    );
-
             eventPublisher.publishEvent(new RegistrationCompleteEvent(user, Utils.getApplicationUrl(servletRequest)));
 
-            return RegistrationResponse.builder()
-                    .message("Registration successfully")
-                    .user(userMapper.toUserResponse(user))
-                    .code(200)
-                    .status(true)
-                    .timeStamp(LocalDateTime.parse(LocalDateTime.now().toString()))
-                    .data(request.email())
-                    .token(verificationToken.getToken())
+            return BasedMessage.builder()
+                    .message("User has been registered, Please verify your email address")
                     .build();
 
         }
 
         @PostMapping("/verify-email")
-        public BasedMessage verifyEmail(@RequestParam String token, final HttpServletRequest servletRequest) {
+        public RegistrationResponse verifyEmail(@RequestParam String token) {
 
             VerificationToken verificationToken = verificationTokenRepository.findByTokenAndType(token, VerificationToken.TokenType.EMAIL_VERIFICATION)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Token has not been found"));
@@ -101,8 +92,15 @@
             if (validatedToken.equals("valid")) {
                 user.setIsEmailVerified(true);
                 userRepository.save(user);
-                return BasedMessage.builder()
-                        .message("Account verified successfully. Please login")
+                mailService.welcomeMessage(user);
+                return RegistrationResponse.builder()
+                        .message("Registration successfully")
+                        .user(userMapper.toUserResponse(user))
+                        .code(200)
+                        .status(true)
+                        .timeStamp(LocalDateTime.parse(LocalDateTime.now().toString()))
+                        .data(user.getEmail())
+                        .token(verificationToken.getToken())
                         .build();
             }
             throw new ResponseStatusException(
@@ -114,6 +112,34 @@
         @GetMapping
         public List<UserResponse> getAllUsers() {
             return userService.getAllUsers();
+        }
+
+        @PutMapping("/{uuid}/upload-image")
+        public BasedMessage uploadImage(@PathVariable String uuid, @RequestBody String profileImage) {
+
+            userService.uploadProfile(uuid, profileImage);
+
+            return BasedMessage.builder()
+                    .message("Image uploaded successfully")
+                    .build();
+
+        }
+
+        @GetMapping("/{uuid}")
+        public UserResponse getUserByUuid(@PathVariable String uuid) {
+
+            return userService.getUserByUuid(uuid);
+
+        }
+
+        @PatchMapping("/{uuid}")
+        public BasedMessage updateUser(@PathVariable String uuid, @RequestBody UserUpdateRequest request) {
+
+            userService.updateUser(uuid, request);
+
+            return BasedMessage.builder()
+                    .message("User updated successfully")
+                    .build();
         }
 
     }
