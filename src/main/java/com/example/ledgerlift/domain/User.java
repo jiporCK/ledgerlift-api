@@ -64,6 +64,7 @@ public class User extends Auditable {
     /**
      * Indicates whether the user's account is bloStringcked.
      */
+    @Column(nullable = false)
     private Boolean isBlocked;
 
     /**

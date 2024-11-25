@@ -133,13 +133,28 @@
         }
 
         @PutMapping("/{uuid}")
-        public BasedMessage updateUser(@PathVariable String uuid, @RequestBody UserUpdateRequest request) {
+        public void updateUser(@PathVariable String uuid, @RequestBody UserUpdateRequest request) {
 
             userService.updateUser(uuid, request);
 
+        }
+
+        @PutMapping("/{uuid}/block-user")
+        public void blockUser(@PathVariable String uuid) {
+
+            userService.blockUserByUuid(uuid);
+
+        }
+
+        @PutMapping("/{uuid}/unblock-user")
+        public BasedMessage unblockUser(@PathVariable String uuid) {
+
+            userService.unblockUserByUuid(uuid);
+
             return BasedMessage.builder()
-                    .message("User updated successfully")
+                    .message("User unblocked successfully")
                     .build();
+
         }
 
     }

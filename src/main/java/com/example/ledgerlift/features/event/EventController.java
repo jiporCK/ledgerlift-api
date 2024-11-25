@@ -41,11 +41,30 @@ public class EventController {
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @PutMapping("/{uuid}")
+    @PutMapping("/{uuid}/hide-event")
     public void hideByUuid(@PathVariable String uuid) {
 
         eventService.hideEventByUuid(uuid);
 
     }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{uuid}")
+    public void updateEventByUuid(@PathVariable String uuid,
+                                  @Valid @RequestBody EventRequest request) {
+
+        eventService.updateEventByUuid(uuid, request);
+
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{uuid}/upload-image")
+    public void updateEventImage(@PathVariable String uuid,
+                                 @Valid @RequestBody String image) {
+
+        eventService.setEventImage(uuid, image);
+
+    }
+
 
 }

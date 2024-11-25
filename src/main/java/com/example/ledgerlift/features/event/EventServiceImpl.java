@@ -86,8 +86,21 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void updateEventByUuid(String uuid, EventRequest EventRequest) {
+    public void updateEventByUuid(String uuid, EventRequest request) {
 
+        Event event = eventRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Event has not been found!"
+                        )
+                );
+
+        event.setName(request.name());
+        event.setDescription(request.description());
+        event.setGoalAmount(request.goalAmount());
+
+        eventRepository.save(event);
     }
 
     @Override
@@ -139,4 +152,19 @@ public class EventServiceImpl implements EventService {
 
     }
 
+    @Override
+    public void setEventImage(String uuid, String image) {
+
+        Event event = eventRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Event has not been found!"
+                        )
+                );
+
+        event.setImage(image);
+        eventRepository.save(event);
+
+    }
 }

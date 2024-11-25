@@ -23,4 +23,9 @@ public interface UserService {
     void saveUserVerificationToken(User theUser, String verificationToken, VerificationToken.TokenType tokenType);
 
     void updateUser(String uuid, UserUpdateRequest request);
+
+    void blockUserByUuid(String uuid);
+
+    void unblockUserByUuid(String uuid);
+
 }

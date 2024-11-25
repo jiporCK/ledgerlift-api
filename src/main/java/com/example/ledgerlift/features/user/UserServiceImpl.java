@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -125,6 +124,7 @@ public class UserServiceImpl implements UserService {
 
         return "valid";
     }
+
     @Transactional
     @Override
     public void saveUserVerificationToken(User theUser, String token, VerificationToken.TokenType type) {
@@ -150,5 +150,38 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
 
+    }
+
+    @Transactional
+    @Override
+    public void blockUserByUuid(String uuid) {
+
+        User user = userRepository.findByUuid(uuid)
+                        .orElseThrow(
+                                () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")
+                        );
+
+        if (user.getIsBlocked().equals(true)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User has already been blocked");
+        }
+
+        userRepository.blockByUuid(uuid);
+
+    }
+
+    @Transactional
+    @Override
+    public void unblockUserByUuid(String uuid) {
+
+        User user = userRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")
+                );
+
+        if (user.getIsBlocked().equals(false)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User has already been unblocked");
+        }
+
+        userRepository.unBlockByUuid(uuid);
     }
 }

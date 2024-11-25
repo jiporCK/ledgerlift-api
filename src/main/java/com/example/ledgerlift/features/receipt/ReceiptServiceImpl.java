@@ -5,6 +5,8 @@ import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.domain.Receipt;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.event.EventRepository;
+import com.example.ledgerlift.features.event.donation.DonationRequest;
+import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.receipt.dto.ReceiptResponse;
 import com.example.ledgerlift.features.user.UserRepository;
 import com.example.ledgerlift.mapper.ReceiptMapper;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,6 +27,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     private final ReceiptRepository receiptRepository;
     private final UserRepository userRepository;
     private final ReceiptMapper receiptMapper;
+    private final MailService mailService;
 
     @Override
     public List<ReceiptResponse> getReceiptByUserUuid(String userUuid) {
@@ -42,7 +46,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     @Override
-    public void createReceipt(User user, Event event) {
+    public void createReceipt(User user, Event event, DonationRequest request) {
 
         Organization organization = event.getOrganization();
 
@@ -54,10 +58,12 @@ public class ReceiptServiceImpl implements ReceiptService {
         receipt.setTransactionId(transactionId);
         receipt.setReceiptId(receiptId);
         receipt.setUser(user);
-        receipt.setAmount(null);
+        receipt.setAmount(request.amount());
         receipt.setDate(LocalDateTime.now());
 
         receiptRepository.save(receipt);
+
+        mailService.sendDonationReceipt(user, receipt);
 
     }
 

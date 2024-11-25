@@ -2,6 +2,7 @@ package com.example.ledgerlift.features.event;
 
 import com.example.ledgerlift.features.event.dto.EventRequest;
 import com.example.ledgerlift.features.event.dto.EventResponse;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -23,4 +24,5 @@ public interface EventService {
 
     void hideEventByUuid(String uuid);
 
+    void setEventImage(String uuid, String image);
 }
