@@ -54,11 +54,18 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendTokenForEmailVerification(User user, String verificationToken) {
         String subject = "Email Verification";
-        String mailContent = "<p>Hi " + user.getUsername() + ",</p>" +
-                "<p>Thank you for registering with us. Please, follow the link below to complete your registration:</p>" +
-                "<p>This is your token: " + verificationToken + "</p>" +
-                "<a href=\"" + clientUrl + "\">Verify your email to activate your account</a>" +
-                "<p>Thank you,<br>Team</p>";
+        String mailContent = "<div style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333;\">" +
+                "<p style=\"font-size: 16px;\">Hi <strong>" + user.getUsername() + "</strong>,</p>" +
+                "<p style=\"font-size: 14px;\">Thank you for registering with us! We are excited to have you on board. Please follow the link below to complete your registration and activate your account:</p>" +
+                "<p style=\"font-size: 14px; color: #555;\">Here is your verification token:</p>" +
+                "<p style=\"font-size: 18px; color: #000; font-weight: bold;\">" + verificationToken + "</p>" +
+                "<p style=\"text-align: center; margin: 20px 0;\">" +
+                "<a href=\"" + clientUrl + "\" style=\"display: inline-block; padding: 10px 20px; font-size: 16px; color: #fff; background-color: #007BFF; text-decoration: none; border-radius: 5px;\">Verify Your Email</a>" +
+                "</p>" +
+                "<p style=\"font-size: 14px;\">If you have any questions, feel free to reach out to us.</p>" +
+                "<p style=\"font-size: 14px;\">Thank you,<br><strong>Team</strong></p>" +
+                "</div>";
+
 
         MailRequest request = MailRequest.builder()
                 .from(mailFrom)

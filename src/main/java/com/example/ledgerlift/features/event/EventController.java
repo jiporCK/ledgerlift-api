@@ -2,6 +2,7 @@ package com.example.ledgerlift.features.event;
 
 import com.example.ledgerlift.features.event.dto.EventRequest;
 import com.example.ledgerlift.features.event.dto.EventResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class EventController {
     @PostMapping("/{organizationUuid}/{categoryUuid}")
     public void createCause(@PathVariable String organizationUuid,
                             @PathVariable String categoryUuid,
-                            @RequestBody EventRequest request) {
+                            @Valid @RequestBody EventRequest request) {
 
         eventService.createEvent(organizationUuid, categoryUuid, request);
 

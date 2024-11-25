@@ -47,6 +47,13 @@ public class UserServiceImpl implements UserService {
             );
         }
 
+        if (userRepository.existsByUsername(request.username())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Username is already in use, Please use other name"
+            );
+        }
+
         user.setUuid(Utils.generateUuid());
         user.setIsProfiledVisibility(false);
         user.setIsEmailVerified(false);

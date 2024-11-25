@@ -132,7 +132,7 @@
 
         }
 
-        @PatchMapping("/{uuid}")
+        @PutMapping("/{uuid}")
         public BasedMessage updateUser(@PathVariable String uuid, @RequestBody UserUpdateRequest request) {
 
             userService.updateUser(uuid, request);

@@ -4,6 +4,7 @@ import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -21,7 +22,7 @@ public class OrganizationController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{userUuid}")
     public void createOrganization(@PathVariable String userUuid,
-                                   @RequestBody OrganizationRequest request) {
+                                   @Valid @RequestBody OrganizationRequest request) {
 
         organizationService.createOrganization(userUuid, request);
 

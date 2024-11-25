@@ -3,6 +3,7 @@ package com.example.ledgerlift.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class Category {
 
     private String uuid;
 
+    @Column(nullable = false, unique = true)
     private String name;
 
     private String description;

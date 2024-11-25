@@ -5,6 +5,7 @@ import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 
 import java.util.List;
@@ -22,12 +23,17 @@ public class User extends Auditable {
 
     private String uuid;
 
+    @Column(unique = true, nullable = false)
     private String username;
 
+    @NonNull
+    @Column(nullable = false)
     private String password;
 
     private String phoneNumber;
 
+    @NonNull
+    @Column(unique = true, nullable = false)
     private String email;
 
     private String avatar;
@@ -68,7 +74,7 @@ public class User extends Auditable {
     @OneToMany(mappedBy = "user")
     private List<Organization> organizations;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "users")
     private List<Role> roles;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

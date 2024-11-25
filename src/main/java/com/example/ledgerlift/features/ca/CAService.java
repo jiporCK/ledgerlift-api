@@ -1,19 +1,23 @@
 package com.example.ledgerlift.features.ca;
 
+import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.ca.dto.CAEnrollmentRequest;
 
+import com.example.ledgerlift.features.user.UserRepository;
 import com.example.ledgerlift.utils.FabricUtils;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hyperledger.fabric.gateway.*;
 import org.hyperledger.fabric.sdk.Enrollment;
-import org.hyperledger.fabric.sdk.User;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.EnrollmentRequest;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -24,8 +28,10 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CAService {
 
+    private final UserRepository userRepository;
     @Value("${fabric.ca.org1.caUrl}")
     private String org1CaUrl;
     @Value("${fabric.ca.org1.certificatePath}")
@@ -128,7 +134,7 @@ public class CAService {
         }
 
         // 1.1 getting the registrar
-        var adminUser = new User() {
+        var adminUser = new org.hyperledger.fabric.sdk.User() {
 
             final X509Identity x509Identity = (X509Identity) adminIdentity;
 
@@ -243,7 +249,15 @@ public class CAService {
         log.info("Successfully store the identity to the wallet !  ");
     }
 
-    public void registerAndEnrollUser(CAEnrollmentRequest request) throws Exception {
+    public void registerAndEnrollUser(String userUuid, CAEnrollmentRequest request) throws Exception {
+
+        User user = userRepository.findByUuid(userUuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "User has not been found"
+                        )
+                );
 
         // HFCA client
         var props = new Properties();
@@ -253,15 +267,21 @@ public class CAService {
         caClient.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
 
         // 1. register
-        var registrationRequest = new RegistrationRequest(request.getUsername());
+        var registrationRequest = new RegistrationRequest(user.getUsername());
         registrationRequest.setAffiliation(request.getAffiliation());
         registrationRequest.setType(request.getType());
 
-        if (request.getGenSecret() && (request.getSecret() == null || request.getSecret().isEmpty())) {
-            registrationRequest.setSecret(generateSecret());
-        } else {
-            registrationRequest.setSecret(request.getSecret());
+        if (request.getSecret() == null || request.getSecret().isEmpty()) {
+            if (request.getGenSecret()) {
+                String generatedSecret = generateSecret();
+                request.setSecret(generatedSecret);
+                log.info("Generated secret: {}", generatedSecret);
+            } else {
+                throw new IllegalArgumentException("Secret must be provided if genSecret is false");
+            }
         }
+        registrationRequest.setSecret(request.getSecret());
+
 
         registrationRequest.setMaxEnrollments(-1); // unlimited enrollments if needed
 
@@ -270,7 +290,7 @@ public class CAService {
             throw new Exception("Admin identity not found in the wallet");
 
         // 1.1 getting the registrar
-        var adminUser = new User() {
+        var adminUser = new org.hyperledger.fabric.sdk.User() {
 
             final X509Identity x509Identity = (X509Identity) adminIdentity;
 

@@ -2,6 +2,7 @@ package com.example.ledgerlift.features.catetory;
 
 import com.example.ledgerlift.features.catetory.dto.CategoryRequest;
 import com.example.ledgerlift.features.catetory.dto.CategoryResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,7 @@ public class CategoryController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
-    public void createCategory(@RequestBody CategoryRequest request) {
+    public void createCategory(@Valid @RequestBody CategoryRequest request) {
 
         categoryService.createCategory(request);
 

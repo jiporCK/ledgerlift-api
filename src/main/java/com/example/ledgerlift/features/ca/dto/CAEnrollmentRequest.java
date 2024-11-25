@@ -1,5 +1,6 @@
 package com.example.ledgerlift.features.ca.dto;
 
+import jakarta.persistence.Column;
 import lombok.*;
 
 @Builder
@@ -11,6 +12,7 @@ public class CAEnrollmentRequest {
 
     private String username;
 
+    @Column(nullable = true)
     private String secret;
 
     private String affiliation; // org1.department1

@@ -3,6 +3,7 @@ package com.example.ledgerlift.features.auth;
 import com.example.ledgerlift.features.auth.dto.AuthResponse;
 import com.example.ledgerlift.features.auth.dto.LoginRequest;
 import com.example.ledgerlift.features.auth.dto.RefreshTokenRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,12 +18,12 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    AuthResponse login(@RequestBody LoginRequest request) {
+    AuthResponse login(@Valid @RequestBody LoginRequest request) {
         return authService.login(request);
     }
 
     @PostMapping("/refresh")
-    AuthResponse refresh(@RequestBody RefreshTokenRequest request) {
+    AuthResponse refresh(@Valid @RequestBody RefreshTokenRequest request) {
         return authService.refresh(request);
     }
 
