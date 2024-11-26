@@ -23,10 +23,10 @@ public class Role implements GrantedAuthority {
 
     private String name;
 
-    @ManyToMany(cascade = CascadeType.DETACH)
+    @ManyToMany(mappedBy = "roles", cascade = CascadeType.DETACH)
     private List<User> users;
 
-    @ManyToMany(mappedBy = "roles", cascade = CascadeType.DETACH)
+    @ManyToMany
     private List<Authority> authorities;
 
     @Override

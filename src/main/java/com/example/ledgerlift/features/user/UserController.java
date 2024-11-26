@@ -16,6 +16,7 @@
     import com.example.ledgerlift.utils.MailUtils;
     import com.example.ledgerlift.utils.Utils;
     import jakarta.servlet.http.HttpServletRequest;
+    import jakarta.validation.Valid;
     import lombok.RequiredArgsConstructor;
     import lombok.extern.slf4j.Slf4j;
     import org.springframework.context.ApplicationEventPublisher;
@@ -43,7 +44,7 @@
         private final VerificationTokenRepository verificationTokenRepository;
 
         @PostMapping("/user-registration")
-        public BasedMessage createUser(@RequestBody RegistrationRequest request, final HttpServletRequest servletRequest) {
+        public BasedMessage createUser(@Valid @RequestBody RegistrationRequest request, final HttpServletRequest servletRequest) {
 
             UserResponse response = userService.createUser(request);
             User user = userMapper.fromUserResponse(response);

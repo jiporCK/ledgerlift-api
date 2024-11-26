@@ -7,11 +7,9 @@ import java.math.BigDecimal;
 @Builder
 public record DonationRequest(
 
-        String donorName,
+        BigDecimal amount,
 
-        String eventName,
-
-        BigDecimal amount
+        String message
 
 ) {
 }

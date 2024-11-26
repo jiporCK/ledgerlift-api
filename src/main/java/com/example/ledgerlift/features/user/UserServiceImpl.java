@@ -33,7 +33,6 @@ public class UserServiceImpl implements UserService {
     private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
 
-    @Transactional
     @Override
     public UserResponse createUser(RegistrationRequest request) {
 

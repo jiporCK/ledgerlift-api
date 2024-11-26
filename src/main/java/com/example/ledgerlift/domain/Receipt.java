@@ -25,6 +25,8 @@ public class Receipt {
 
     private BigDecimal amount;
 
+    private String message;
+
     private LocalDateTime date;
 
     @ManyToOne

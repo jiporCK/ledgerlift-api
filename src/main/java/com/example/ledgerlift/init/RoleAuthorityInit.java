@@ -13,6 +13,7 @@ import java.util.List;
 public class RoleAuthorityInit {
 
     private final RoleRepository roleRepository;
+    private final AuthorityRepository authorityRepository;
 
     @PostConstruct
     void initRole() {
@@ -21,32 +22,45 @@ public class RoleAuthorityInit {
         if (roleRepository.count() < 1) {
 
             // Authorities
-            Authority readAuthority = new Authority();
-            readAuthority.setName("read");
+            Authority donorRead = new Authority();
+            donorRead.setName("donor:read");
 
-            Authority writeAuthority = new Authority();
-            writeAuthority.setName("write");
+            Authority donorWrite = new Authority();
+            donorWrite.setName("donor:write");
+
+            Authority adminRead = new Authority();
+            adminRead.setName("admin:read");
+
+            Authority adminWrite = new Authority();
+            adminWrite.setName("admin:write");
+
+            Authority organizerRead = new Authority();
+            organizerRead.setName("organizer:read");
+
+            Authority organizerWrite = new Authority();
+            organizerWrite.setName("organizer:write");
+
+            authorityRepository.saveAll(List.of(
+               donorRead, donorWrite, adminRead, adminWrite, organizerRead, organizerWrite
+            ));
 
             // Roles
             Role admin = new Role();
             admin.setName("ADMIN");
             admin.setAuthorities(List.of(
-                    readAuthority,
-                    writeAuthority
+                    donorWrite, donorRead, adminRead, adminWrite, organizerRead, organizerWrite
             ));
 
             Role donor = new Role();
             donor.setName("DONOR");
             donor.setAuthorities(List.of(
-                    readAuthority,
-                    writeAuthority
+                    donorWrite, donorRead
             ));
 
             Role organizer = new Role();
             organizer.setName("ORGANIZER");
             organizer.setAuthorities(List.of(
-                    readAuthority,
-                    writeAuthority
+                    donorRead, organizerRead, organizerWrite
             ));
 
             // Save roles to repository

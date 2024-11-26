@@ -59,6 +59,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request
                             .requestMatchers(HttpMethod.POST, "api/v1/users/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "api/v1/users/**").hasAnyAuthority("admin:read", "admin:write")
+                            .requestMatchers("api/v1/donate/**").hasAnyAuthority("donor:read", "donor:write")
                             .requestMatchers(
                                     "/ledgeraiser-api-docs/**",  // OpenAPI docs
                                     "/v3/api-docs/**",          // Default API docs path
@@ -66,11 +68,10 @@ public class SecurityConfig {
                                     "/ledgeraiser-api-ui.html"  // Custom Swagger UI
                             ).permitAll()
                             .requestMatchers(HttpMethod.POST, "api/v1/auth/**").permitAll()
-                            .requestMatchers("api/v1/users/**").permitAll()
                             .requestMatchers("api/v1/enrollment/**").permitAll()
                             .requestMatchers("api/v1/media/**").permitAll()
                             .requestMatchers("api/v1/organizations/**").permitAll()
-                            .requestMatchers("api/v1/causes/**").permitAll()
+                            .requestMatchers("api/v1/events/**").permitAll()
                             .requestMatchers(HttpMethod.GET,"api/v1/categories/**").permitAll()
                             .requestMatchers(HttpMethod.POST,"api/v1/categories/**").permitAll()
                             .anyRequest().authenticated();

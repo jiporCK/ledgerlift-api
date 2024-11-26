@@ -13,6 +13,6 @@ public interface ReceiptService {
 
     List<ReceiptResponse> getReceiptByUserUuid(String userUuid);
 
-    void createReceipt(User user, Event event, DonationRequest request);
+    ReceiptResponse createReceipt(User user, Event event, DonationRequest request);
 
 }

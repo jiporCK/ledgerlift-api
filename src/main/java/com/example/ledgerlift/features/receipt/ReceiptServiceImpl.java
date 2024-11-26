@@ -46,7 +46,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     @Override
-    public void createReceipt(User user, Event event, DonationRequest request) {
+    public ReceiptResponse createReceipt(User user, Event event, DonationRequest request) {
 
         Organization organization = event.getOrganization();
 
@@ -59,11 +59,25 @@ public class ReceiptServiceImpl implements ReceiptService {
         receipt.setReceiptId(receiptId);
         receipt.setUser(user);
         receipt.setAmount(request.amount());
+        receipt.setMessage(request.message());
         receipt.setDate(LocalDateTime.now());
 
         receiptRepository.save(receipt);
 
         mailService.sendDonationReceipt(user, receipt);
+
+        return ReceiptResponse.builder()
+                .receiptId(receipt.getReceiptId())
+                .date(receipt.getDate())
+                .transactionId(receipt.getTransactionId())
+                .organizationName(organization.getName())
+                .organizationContact(organization.getPhone())
+                .donorEmail(user.getEmail())
+                .donorName(user.getUsername())
+                .campaignName(event.getName())
+                .amount(request.amount())
+                .message(request.message())
+                .build();
 
     }
 

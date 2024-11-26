@@ -42,10 +42,7 @@ public class DonationService {
                         )
                 );
 
-        receiptService.createReceipt(user, event, donationRequest);
-
-        return ReceiptResponse.builder()
-                .build();
+        return receiptService.createReceipt(user, event, donationRequest);
 
     }
 

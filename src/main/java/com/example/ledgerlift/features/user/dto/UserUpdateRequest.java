@@ -7,5 +7,4 @@ public record UserUpdateRequest(
         String phoneNumber
 
 ) {
-
 }

@@ -23,6 +23,10 @@ public class User extends Auditable {
 
     private String uuid;
 
+    private String firstName;
+
+    private String lastName;
+
     @Column(unique = true, nullable = false)
     private String username;
 
@@ -75,7 +79,7 @@ public class User extends Auditable {
     @OneToMany(mappedBy = "user")
     private List<Organization> organizations;
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany
     private List<Role> roles;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

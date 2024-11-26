@@ -16,7 +16,9 @@ public record ReceiptResponse(
 
         String campaignName,
 
-//        BigDecimal amount,
+        BigDecimal amount,
+
+        String message,
 
         LocalDateTime date,
 

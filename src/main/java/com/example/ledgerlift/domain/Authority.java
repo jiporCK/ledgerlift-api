@@ -20,7 +20,7 @@ public class Authority {
 
     private String name;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "authorities")
     private List<Role> roles;
 
 }

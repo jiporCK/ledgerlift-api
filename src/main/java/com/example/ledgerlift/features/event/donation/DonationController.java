@@ -1,5 +1,6 @@
 package com.example.ledgerlift.features.event.donation;
 
+import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.features.receipt.dto.ReceiptResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +15,10 @@ public class DonationController {
 
     @PostMapping("/{userUuid}/{eventUuid}")
     ReceiptResponse donate(@PathVariable String userUuid,
-                           @PathVariable String eventUuid,
-                           @Valid @RequestBody DonationRequest donationRequest) {
+                        @PathVariable String eventUuid,
+                        @Valid @RequestBody DonationRequest donationRequest) {
 
-         return donationService.donate(userUuid, eventUuid, donationRequest);
+        return donationService.donate(userUuid, eventUuid, donationRequest);
 
     }
 
