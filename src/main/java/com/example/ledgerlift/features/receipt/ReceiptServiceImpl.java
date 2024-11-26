@@ -28,6 +28,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     private final UserRepository userRepository;
     private final ReceiptMapper receiptMapper;
     private final MailService mailService;
+    private final EventRepository eventRepository;
 
     @Override
     public List<ReceiptResponse> getReceiptByUserUuid(String userUuid) {
@@ -54,6 +55,7 @@ public class ReceiptServiceImpl implements ReceiptService {
         String transactionId = Utils.generateUuid();
 
         Receipt receipt = new Receipt();
+        receipt.setEvent(event);
         receipt.setOrganization(organization);
         receipt.setTransactionId(transactionId);
         receipt.setReceiptId(receiptId);
@@ -65,6 +67,15 @@ public class ReceiptServiceImpl implements ReceiptService {
         receiptRepository.save(receipt);
 
         mailService.sendDonationReceipt(user, receipt);
+
+        BigDecimal currentAmount = event.getCurrentAmount();
+        event.setCurrentAmount(currentAmount.add(request.amount()));
+
+        if (event.getGoalAmount().equals(event.getCurrentAmount())) {
+            event.setIsCompleted(true);
+        }
+
+        eventRepository.save(event);
 
         return ReceiptResponse.builder()
                 .receiptId(receipt.getReceiptId())

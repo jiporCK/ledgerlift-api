@@ -59,8 +59,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request
                             .requestMatchers(HttpMethod.POST, "api/v1/users/**").permitAll()
-                            .requestMatchers(HttpMethod.GET, "api/v1/users/**").hasAnyAuthority("admin:read", "admin:write")
-                            .requestMatchers("api/v1/donate/**").hasAnyAuthority("donor:read", "donor:write")
+                            .requestMatchers(HttpMethod.GET, "api/v1/users/**").hasAnyAuthority("SCOPE_admin:read", "SCOPE_admin:write")
+                            .requestMatchers("api/v1/donate/**").hasAnyAuthority("SCOPE_donor:read", "SCOPE_donor:write")
                             .requestMatchers(
                                     "/ledgeraiser-api-docs/**",  // OpenAPI docs
                                     "/v3/api-docs/**",          // Default API docs path
