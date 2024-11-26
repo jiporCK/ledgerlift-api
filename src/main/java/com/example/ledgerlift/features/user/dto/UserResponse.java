@@ -4,6 +4,10 @@ public record UserResponse(
 
         String uuid,
 
+        String firstName,
+
+        String lastName,
+
         String username,
 
         String password,

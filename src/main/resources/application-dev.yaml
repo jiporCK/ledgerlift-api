@@ -6,7 +6,7 @@ DB_NAME: ledgerliftdb
 
 MEDIA_SERVER_PATH: src/main/resources/filestorage/idata-medias/
 MEDIA_BASE_URI=http: http://localhost:8080/media
-MEDIA_CLIENT_PATH:  /media/**
+MEDIA_CLIENT_PATH: /media/**
 
 GMAIL_USERNAME: srengchipor99@gmail.com
 GMAIL_PASSWORD: cmyy qama rcbk brqu

@@ -26,6 +26,11 @@ public class EventController {
 
     }
 
+    @GetMapping
+    public List<EventResponse> getAll() {
+        return eventService.getAllEvents();
+    }
+
     @GetMapping("/{categoryUuid}")
     public List<EventResponse> getEventsByCategory(@PathVariable String categoryUuid) {
 

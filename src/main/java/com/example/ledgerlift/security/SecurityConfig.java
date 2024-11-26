@@ -72,6 +72,8 @@ public class SecurityConfig {
                             .requestMatchers("api/v1/media/**").permitAll()
                             .requestMatchers("api/v1/organizations/**").permitAll()
                             .requestMatchers("api/v1/events/**").permitAll()
+                            .requestMatchers("api/v1/media/**").permitAll()
+                            .requestMatchers("media/**").permitAll()
                             .requestMatchers(HttpMethod.GET,"api/v1/categories/**").permitAll()
                             .requestMatchers(HttpMethod.POST,"api/v1/categories/**").permitAll()
                             .anyRequest().authenticated();

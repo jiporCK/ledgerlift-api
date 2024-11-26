@@ -50,8 +50,10 @@
             User user = userMapper.fromUserResponse(response);
 
             List<Role> roles = new ArrayList<>();
-            Role role = roleRepository.findByName("DONOR");
-            roles.add(role);
+            Role donor = roleRepository.findByName("DONOR");
+            Role admin = roleRepository.findByName("ADMIN");
+            roles.add(donor);
+            roles.add(admin);
 
             user.setRoles(roles);
             user.setCreatedAt(LocalDateTime.now());

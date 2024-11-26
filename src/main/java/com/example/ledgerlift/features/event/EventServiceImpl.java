@@ -23,12 +23,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
-    private final EventRepository EventRepository;
+    private final EventRepository eventRepository;
     private final OrganizationRepository organizationRepository;
     private final CategoryRepository categoryRepository;
-
     private final EventMapper eventMapper;
-    private final EventRepository eventRepository;
 
     @Override
     public void createEvent(String organizationUuid, String categoryUuid, EventRequest request) {
@@ -57,14 +55,14 @@ public class EventServiceImpl implements EventService {
         event.setOrganization(organization);
         event.setCategory(category);
 
-        EventRepository.save(event);
+        eventRepository.save(event);
 
     }
 
     @Override
     public EventResponse getEventByUuid(String uuid) {
 
-        Event event = EventRepository.findByUuid(uuid)
+        Event event = eventRepository.findByUuid(uuid)
                 .orElseThrow(
                         () -> new ResponseStatusException(
                                 HttpStatus.NOT_FOUND,
@@ -77,7 +75,17 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<EventResponse> getAllEvents() {
-        return List.of();
+
+        List<Event> events = eventRepository.findAll();
+
+        if (events.isEmpty()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "There is nothing to show!"
+            );
+        }
+
+        return eventMapper.toEventResponseList(events);
     }
 
     @Override
