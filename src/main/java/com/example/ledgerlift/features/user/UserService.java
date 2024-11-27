@@ -28,4 +28,6 @@ public interface UserService {
 
     void unblockUserByUuid(String uuid);
 
+    void deleteUserByUuid(String uuid);
+
 }

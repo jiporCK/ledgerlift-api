@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/enrollment")
+@RequestMapping("/api/v1/ca-enrollment")
 public class CAController {
 
     private final CAService caService;

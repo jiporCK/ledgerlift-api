@@ -1,5 +1,6 @@
 package com.example.ledgerlift.features.media;
 
+import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.features.media.dto.MediaResponse;
 import com.example.ledgerlift.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -63,4 +63,22 @@ public class MediaServiceImpl implements MediaService{
                 .build();
 
     }
+
+    @Override
+    public BasedMessage deleteMediaByName(String mediaName) {
+
+        Path path = Paths.get(serverPath + mediaName);
+
+        try {
+            if (Files.deleteIfExists(path)) {
+                return new BasedMessage("Media has been deleted");
+            } throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "Media has not been found");
+        } catch (IOException e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format("Media path %s cannot be deleted", e.getLocalizedMessage()));
+        }
+
+    }
+
 }

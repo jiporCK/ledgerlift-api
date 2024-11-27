@@ -1,5 +1,6 @@
 package com.example.ledgerlift.features.event;
 
+import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.features.event.dto.EventRequest;
 import com.example.ledgerlift.features.event.dto.EventResponse;
 import jakarta.validation.Valid;
@@ -68,6 +69,17 @@ public class EventController {
                                  @Valid @RequestBody String image) {
 
         eventService.setEventImage(uuid, image);
+
+    }
+
+    @DeleteMapping("/{eventUuid}")
+    public BasedMessage deleteEvent(@PathVariable String eventUuid) {
+
+        eventService.deleteEventByUuid(eventUuid);
+
+        return BasedMessage.builder()
+                .message("Event deleted successfully")
+                .build();
 
     }
 

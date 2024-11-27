@@ -34,6 +34,8 @@ public class Organization extends Auditable {
 
     private String moneyQRCode;
 
+    private Boolean isActive;
+
     @ManyToOne
     private User user;
 

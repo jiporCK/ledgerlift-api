@@ -184,4 +184,16 @@ public class UserServiceImpl implements UserService {
 
         userRepository.unBlockByUuid(uuid);
     }
+
+    @Override
+    public void deleteUserByUuid(String uuid) {
+
+        User user = userRepository.findByUuid(uuid)
+                .orElseThrow(
+                        ()  -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")
+                );
+
+        userRepository.delete(user);
+
+    }
 }

@@ -3,6 +3,7 @@ package com.example.ledgerlift.features.organization;
 import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -12,10 +13,14 @@ public interface OrganizationService {
 
     OrganizationResponse getOrganizationByUuid(String uuid);
 
+    List<OrganizationResponse> getOrganizationsByUserUuid(String userUuid);
+
     List<OrganizationResponse> getAll();
 
     void deleteOrganizationByUuid(String uuid);
 
-    void updateOrganizationByUuid(String uuid, Organization organization);
+    void updateOrganizationByUuid(String uuid, OrganizationRequest request);
+
+    void uploadQrImage(String organizationUuid, @Valid String qrImage);
 
 }

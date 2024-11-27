@@ -91,6 +91,16 @@ public class EventServiceImpl implements EventService {
     @Override
     public void deleteEventByUuid(String uuid) {
 
+        Event event = eventRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Event has not been found!"
+                        )
+                );
+
+        eventRepository.delete(event);
+
     }
 
     @Override

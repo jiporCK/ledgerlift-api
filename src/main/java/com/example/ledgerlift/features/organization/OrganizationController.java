@@ -1,5 +1,6 @@
 package com.example.ledgerlift.features.organization;
 
+import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
@@ -33,6 +34,45 @@ public class OrganizationController {
     public List<OrganizationResponse> getAll() {
 
         return organizationService.getAll();
+
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/{userUuid}")
+    public List<OrganizationResponse> getAll(@PathVariable String userUuid) {
+
+        return organizationService.getOrganizationsByUserUuid(userUuid);
+
+    }
+
+    @PutMapping("/{organizationUuid}/upload-qr")
+    public void uploadMoneyQrCode(@PathVariable String organizationUuid,
+                                  @Valid @RequestBody String qrImage) {
+
+        organizationService.uploadQrImage(organizationUuid, qrImage);
+
+    }
+
+    @PutMapping("/{organizationUuid}")
+    public BasedMessage updateOrganization(@PathVariable String organizationUuid,
+                                           @RequestBody OrganizationRequest request) {
+
+        organizationService.updateOrganizationByUuid(organizationUuid, request);
+
+        return BasedMessage.builder()
+                .message("Organization updated successfully")
+                .build();
+
+    }
+
+    @DeleteMapping("/{organizationUuid}")
+    public BasedMessage deleteOrganization(@PathVariable String organizationUuid) {
+
+        organizationService.deleteOrganizationByUuid(organizationUuid);
+
+        return BasedMessage.builder()
+                .message("Organization deleted successfully")
+                .build();
 
     }
 

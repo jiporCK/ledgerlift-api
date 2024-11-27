@@ -70,10 +70,59 @@ public class OrganizationServiceImpl implements OrganizationService {
     @Override
     public void deleteOrganizationByUuid(String uuid) {
 
+        Organization organization = organizationRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Organization with uuid " + uuid + " not found"
+                        )
+                );
+
+        organizationRepository.delete(organization);
+
     }
 
     @Override
-    public void updateOrganizationByUuid(String uuid, Organization organization) {
+    public void updateOrganizationByUuid(String uuid, OrganizationRequest request) {
+
+        Organization organization = organizationMapper.fromOrganizationRequest(request);
+
+        organizationRepository.save(organization);
+
+    }
+
+    @Override
+    public void uploadQrImage(String organizationUuid, String qrImage) {
+
+        Organization organization = organizationRepository.findByUuid(organizationUuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Organization with uuid " + organizationUuid + " not found"
+                        )
+                );
+
+        organization.setMoneyQRCode(qrImage);
+
+    }
+
+    @Override
+    public List<OrganizationResponse> getOrganizationsByUserUuid(String userUuid) {
+        User user = userRepository.findByUuid(userUuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "User with uuid " + userUuid + " not found"
+                        )
+                );
+
+        List<Organization> organizations = user.getOrganizations();
+        if (organizations.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "User with uuid " + userUuid + " does not have any organizations");
+        }
+
+        return organizationMapper.toOrganizationResponseList(organizations);
 
     }
 }
