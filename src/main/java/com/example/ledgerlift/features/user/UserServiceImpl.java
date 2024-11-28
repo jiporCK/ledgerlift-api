@@ -6,6 +6,7 @@ import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
 import com.example.ledgerlift.features.user.dto.RegistrationRequest;
+import com.example.ledgerlift.features.user.dto.UserDetail;
 import com.example.ledgerlift.features.user.dto.UserResponse;
 import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
 import com.example.ledgerlift.mapper.UserMapper;
@@ -196,4 +197,17 @@ public class UserServiceImpl implements UserService {
         userRepository.delete(user);
 
     }
+
+    @Override
+    public UserDetail getUserInfo(String uuid) {
+
+        User user = userRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")
+                );
+
+        return userMapper.toUserDetail(user);
+
+    }
+
 }

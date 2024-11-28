@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -49,6 +50,8 @@ public class User extends Auditable {
     private Boolean isAccountVerified;
 
     private Boolean isAnonymous;
+
+    private LocalDateTime lastLoginAt;
 
     /**
      * Indicates whether the user's account is expired.

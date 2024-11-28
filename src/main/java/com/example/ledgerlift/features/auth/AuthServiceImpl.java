@@ -67,6 +67,9 @@ public class AuthServiceImpl implements AuthService{
 
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 
+        user.setLastLoginAt(LocalDateTime.now());
+        userRepository.save(user);
+
         return tokenService.createToken(userDetails.getUser(), auth) ;
     }
 

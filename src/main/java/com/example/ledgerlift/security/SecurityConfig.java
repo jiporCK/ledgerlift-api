@@ -59,6 +59,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request
                             .requestMatchers(HttpMethod.POST, "api/v1/users/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "api/v1/users/me").hasAnyAuthority("SCOPE_donor:read", "SCOPE_admin:read", "SCOPE_organizer:read")
                             .requestMatchers(HttpMethod.GET, "api/v1/users/**").hasAnyAuthority("SCOPE_admin:read", "SCOPE_admin:write")
                             .requestMatchers("api/v1/donate/**").hasAnyAuthority("SCOPE_donor:read", "SCOPE_donor:write")
                             .requestMatchers(

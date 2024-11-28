@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -80,6 +81,16 @@ public class EventController {
         return BasedMessage.builder()
                 .message("Event deleted successfully")
                 .build();
+
+    }
+
+    @PostMapping("/{uuid}/upload-images")
+    public BasedMessage uploadEventImages(@PathVariable String uuid,
+                                          @Valid @RequestBody List<String> images) {
+
+        eventService.uploadImages(uuid, images);
+
+        return new BasedMessage("Images uploaded successfully");
 
     }
 

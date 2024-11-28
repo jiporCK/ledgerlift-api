@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -54,6 +55,8 @@ public class MediaServiceImpl implements MediaService{
             );
         }
 
+
+
         return MediaResponse.builder()
                 .name(newMediaName)
                 .contentType(file.getContentType())
@@ -62,6 +65,11 @@ public class MediaServiceImpl implements MediaService{
                 .uri(String.format("%s%s/%s", baseUri, folderName, newMediaName))
                 .build();
 
+    }
+
+    @Override
+    public List<MediaResponse> uploadMultiple(MultipartFile[] files, String s) {
+        return List.of();
     }
 
     @Override

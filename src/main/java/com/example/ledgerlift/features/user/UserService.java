@@ -3,6 +3,7 @@ package com.example.ledgerlift.features.user;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.user.dto.RegistrationRequest;
+import com.example.ledgerlift.features.user.dto.UserDetail;
 import com.example.ledgerlift.features.user.dto.UserResponse;
 import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
 
@@ -30,4 +31,5 @@ public interface UserService {
 
     void deleteUserByUuid(String uuid);
 
+    UserDetail getUserInfo(String uuid);
 }

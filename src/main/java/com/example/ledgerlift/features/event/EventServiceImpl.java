@@ -185,4 +185,10 @@ public class EventServiceImpl implements EventService {
         eventRepository.save(event);
 
     }
+
+    @Override
+    public void uploadImages(String uuid, List<String> images) {
+
+    }
+
 }

@@ -7,10 +7,7 @@ import com.example.ledgerlift.event.RegistrationCompleteEvent;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
-import com.example.ledgerlift.features.user.dto.RegistrationRequest;
-import com.example.ledgerlift.features.user.dto.RegistrationResponse;
-import com.example.ledgerlift.features.user.dto.UserResponse;
-import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
+import com.example.ledgerlift.features.user.dto.*;
 import com.example.ledgerlift.init.RoleRepository;
 import com.example.ledgerlift.mapper.UserMapper;
 import com.example.ledgerlift.utils.MailUtils;
@@ -21,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -42,6 +41,16 @@ public class UserController {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final VerificationTokenRepository verificationTokenRepository;
+
+    @GetMapping("/me")
+    public UserDetail me(Authentication authentication) {
+
+        Jwt jwt = (Jwt) authentication.getPrincipal();
+        String uuid = jwt.getClaim("uuid");
+
+        return userService.getUserInfo(uuid);
+
+    }
 
     @PostMapping("/user-registration")
     public BasedMessage createUser(@Valid @RequestBody RegistrationRequest request, final HttpServletRequest servletRequest) {
