@@ -68,7 +68,15 @@ public class MediaServiceImpl implements MediaService{
     }
 
     @Override
-    public List<MediaResponse> uploadMultiple(MultipartFile[] files, String s) {
+    public List<MediaResponse> uploadMultiple(List<MultipartFile> files, String s) {
+
+        for (MultipartFile file : files) {
+
+            String newMediaName = Utils.generateUuid();
+            newMediaName += Utils.extractExtension(file.getOriginalFilename());
+
+        }
+
         return List.of();
     }
 

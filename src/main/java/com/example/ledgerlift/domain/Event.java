@@ -48,4 +48,7 @@ public class Event {
     @OneToMany(mappedBy = "event")
     private List<Receipt> receipts;
 
+    @OneToMany(mappedBy = "event")
+    private List<Media> medias;
+
 }

@@ -32,7 +32,11 @@ public class Organization extends Auditable {
 
     private String description;
 
+    private String image;
+
     private String moneyQRCode;
+
+    private String officialWebsite;
 
     private Boolean isActive;
 

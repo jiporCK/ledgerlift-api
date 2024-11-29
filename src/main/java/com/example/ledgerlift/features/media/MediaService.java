@@ -10,7 +10,7 @@ public interface MediaService {
 
     MediaResponse uploadSingle(MultipartFile file, String s);
 
-    List<MediaResponse> uploadMultiple(MultipartFile[] files, String s);
+    List<MediaResponse> uploadMultiple(List<MultipartFile> files, String s);
 
     BasedMessage deleteMediaByName(String mediaName);
 }
