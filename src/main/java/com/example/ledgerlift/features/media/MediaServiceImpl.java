@@ -1,8 +1,12 @@
 package com.example.ledgerlift.features.media;
 
 import com.example.ledgerlift.base.BasedMessage;
+import com.example.ledgerlift.domain.Event;
+import com.example.ledgerlift.domain.Media;
+import com.example.ledgerlift.features.event.EventRepository;
 import com.example.ledgerlift.features.media.dto.MediaResponse;
 import com.example.ledgerlift.utils.Utils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -18,7 +22,12 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class MediaServiceImpl implements MediaService{
+
+    private final MediaRepository mediaRepository;
+
+    private final EventRepository eventRepository;
 
     @Value("${media.server-path}")
     private String serverPath;
@@ -68,16 +77,56 @@ public class MediaServiceImpl implements MediaService{
     }
 
     @Override
-    public List<MediaResponse> uploadMultiple(List<MultipartFile> files, String s) {
+    public  void uploadMultiple(String eventUuid, List<MultipartFile> files, String s) {
+
+        Event event = eventRepository.findByUuid(eventUuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Event has not been found"
+                        )
+                );
 
         for (MultipartFile file : files) {
 
             String newMediaName = Utils.generateUuid();
             newMediaName += Utils.extractExtension(file.getOriginalFilename());
 
+            Path directoryPath = Paths.get(serverPath + s);
+
+            if (!Files.exists(directoryPath)) {
+                try {
+                    Files.createDirectory(directoryPath);
+                } catch (IOException e) {
+                    throw new ResponseStatusException(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            "Could not copy file", e
+                    );
+                }
+            }
+
+            Path path = directoryPath.resolve(newMediaName);
+
+            try {
+                Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                throw new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Could not copy file", e
+                );
+            }
+
+            Media media1 = new Media();
+            media1.setName(newMediaName);
+            media1.setEvent(event);
+            media1.setSize(file.getSize());
+            media1.setContentType(file.getContentType());
+            media1.setUri(String.format("%s%s/%s", baseUri, s, newMediaName));
+
+            mediaRepository.save(media1);
+
         }
 
-        return List.of();
     }
 
     @Override
