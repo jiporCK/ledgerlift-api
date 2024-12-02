@@ -3,6 +3,7 @@ package com.example.ledgerlift.features.event;
 import com.example.ledgerlift.domain.Category;
 import com.example.ledgerlift.domain.Event;
 import com.example.ledgerlift.domain.Organization;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +19,5 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     List<Event> findAllByOrganization(Organization organization);
 
+    boolean existsByNameEqualsIgnoreCase(String name);
 }

@@ -5,6 +5,7 @@ import com.example.ledgerlift.domain.Testimony;
 import com.example.ledgerlift.features.media.dto.ImageRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +47,7 @@ public class TestimonyController {
 
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasAnyAuthority('SCOPE_admin:read', 'SCOPE_admin:write')")
     @DeleteMapping("/{uuid}")
     public BasedMessage deleteTestimony(@PathVariable String uuid) {

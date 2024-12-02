@@ -66,6 +66,16 @@ public class OrganizationController {
 
     }
 
+    @PutMapping("/{organizationUuid}/lock")
+    BasedMessage lockOrganization(@PathVariable String organizationUuid) {
+
+        organizationService.lockOrganization(organizationUuid);
+
+        return new BasedMessage("Organization has been locked");
+
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{organizationUuid}")
     public BasedMessage deleteOrganization(@PathVariable String organizationUuid) {
 

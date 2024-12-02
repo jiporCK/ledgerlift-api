@@ -1,7 +1,9 @@
 package com.example.ledgerlift.features.organization;
 
+import com.example.ledgerlift.domain.Event;
 import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.domain.User;
+import com.example.ledgerlift.features.event.EventRepository;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
@@ -9,6 +11,7 @@ import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
 import com.example.ledgerlift.features.user.UserRepository;
 import com.example.ledgerlift.mapper.OrganizationMapper;
 import com.example.ledgerlift.utils.Utils;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,6 +29,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final UserRepository userRepository;
     private final OrganizationMapper organizationMapper;
     private final MailService mailService;
+    private final EventRepository eventRepository;
 
     @Override
     public void createOrganization(String userUuid, OrganizationRequest request) {
@@ -49,6 +53,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         organization.setUuid(Utils.generateUuid());
         organization.setUser(user);
+        organization.setIsLocked(false);
 
         organizationRepository.save(organization);
         mailService.welcomeOrganization(organization);
@@ -128,4 +133,25 @@ public class OrganizationServiceImpl implements OrganizationService {
         return organizationMapper.toOrganizationResponseList(organizations);
 
     }
+
+    @Transactional
+    @Override
+    public void lockOrganization(String organizationUuid) {
+
+        Organization organization = organizationRepository.findByUuid(organizationUuid)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Organization with uuid " + organizationUuid + " not found"
+                ));
+
+        organizationRepository.lockByUuid(organization.getUuid());
+
+        List<Event> events = organization.getEvents();
+        if (events != null && !events.isEmpty()) {
+            events.forEach(event -> event.setIsVisible(Boolean.FALSE));
+
+            eventRepository.saveAll(events);
+        }
+    }
+
 }

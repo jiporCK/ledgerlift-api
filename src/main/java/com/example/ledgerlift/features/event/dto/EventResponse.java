@@ -12,6 +12,8 @@ public record EventResponse(
 
         String description,
 
+        Boolean isVisible,
+
         BigDecimal goalAmount,
 
         OrganizationResponse organization

@@ -48,6 +48,14 @@ public class EventServiceImpl implements EventService {
                 );
 
         Event event = eventMapper.fromEventCreateRequest(request);
+
+        if (eventRepository.existsByNameEqualsIgnoreCase(request.name())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Event is already existed"
+            );
+        }
+
         event.setUuid(Utils.generateUuid());
         event.setStartDate(LocalDateTime.now());
         event.setEndDate(LocalDateTime.now().plusMonths(1));

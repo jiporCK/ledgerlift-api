@@ -74,6 +74,7 @@ public class EventController {
 
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{eventUuid}")
     public BasedMessage deleteEvent(@PathVariable String eventUuid) {
 
