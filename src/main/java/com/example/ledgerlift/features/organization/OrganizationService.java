@@ -1,6 +1,7 @@
 package com.example.ledgerlift.features.organization;
 
 import com.example.ledgerlift.domain.Organization;
+import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
 import jakarta.validation.Valid;
@@ -21,6 +22,6 @@ public interface OrganizationService {
 
     void updateOrganizationByUuid(String uuid, OrganizationRequest request);
 
-    void uploadQrImage(String organizationUuid, @Valid String qrImage);
+    void uploadQrImage(String organizationUuid, @Valid ImageRequest qrImage);
 
 }

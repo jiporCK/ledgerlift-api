@@ -5,6 +5,7 @@ import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
+import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.user.dto.RegistrationRequest;
 import com.example.ledgerlift.features.user.dto.UserDetail;
 import com.example.ledgerlift.features.user.dto.UserResponse;
@@ -93,12 +94,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void uploadProfile(String uuid, String profile) {
+    public void uploadProfile(String uuid, ImageRequest profile) {
 
         User user = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
 
-        user.setAvatar(profile);
+        user.setAvatar(profile.image());
         userRepository.save(user);
 
         BasedMessage.builder()

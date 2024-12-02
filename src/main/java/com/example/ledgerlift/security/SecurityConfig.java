@@ -63,7 +63,7 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.GET, "api/v1/users/**").hasAnyAuthority("SCOPE_admin:read", "SCOPE_admin:write")
                             .requestMatchers("api/v1/donate/**").hasAnyAuthority("SCOPE_donor:read", "SCOPE_donor:write")
                             .requestMatchers(
-                                    "/ledgeraiser-api-docs/**",  // OpenAPI docs
+                                    "/ledgeraiser-api-docs/**", // OpenAPI docs
                                     "/v3/api-docs/**",          // Default API docs path
                                     "/swagger-ui/**",           // Default Swagger UI assets
                                     "/ledgeraiser-api-ui.html"  // Custom Swagger UI
@@ -74,8 +74,9 @@ public class SecurityConfig {
                             .requestMatchers("api/v1/organizations/**").permitAll()
                             .requestMatchers("api/v1/events/**").permitAll()
                             .requestMatchers(HttpMethod.POST, "api/v1/media/upload-single").permitAll()
-                            .requestMatchers(HttpMethod.POST, "api/v1/media/{eventUuid}/upload-multiple").hasAnyAuthority("SCOPE_organizer:read", "SCOPE_organizer:write")
+                            .requestMatchers(HttpMethod.POST, "api/v1/media/upload-multiple/**").hasAnyAuthority("SCOPE_organizer:read", "SCOPE_organizer:write", "SCOPE_admin:read", "SCOPE_admin:write")
                             .requestMatchers(HttpMethod.DELETE, "api/v1/media/**").hasAnyAuthority("SCOPE_admin:read", "SCOPE_admin:write")
+                            .requestMatchers(HttpMethod.GET, "api/v1/media/get-media-by-event/**").hasAnyAuthority("SCOPE_organizer:read", "SCOPE_organizer:write")
                             .requestMatchers("media/**").permitAll()
                             .requestMatchers(HttpMethod.GET,"api/v1/categories/**").permitAll()
                             .requestMatchers(HttpMethod.POST,"api/v1/categories/**").permitAll()

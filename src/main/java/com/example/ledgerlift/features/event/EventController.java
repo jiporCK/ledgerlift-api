@@ -3,6 +3,7 @@ package com.example.ledgerlift.features.event;
 import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.features.event.dto.EventRequest;
 import com.example.ledgerlift.features.event.dto.EventResponse;
+import com.example.ledgerlift.features.media.dto.ImageRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -86,7 +87,7 @@ public class EventController {
 
     @PostMapping("/{uuid}/upload-images")
     public BasedMessage uploadEventImages(@PathVariable String uuid,
-                                          @Valid @RequestBody List<String> images) {
+                                          @Valid @RequestBody List<ImageRequest> images) {
 
         eventService.uploadImages(uuid, images);
 

@@ -6,6 +6,7 @@ import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.features.catetory.CategoryRepository;
 import com.example.ledgerlift.features.event.dto.EventRequest;
 import com.example.ledgerlift.features.event.dto.EventResponse;
+import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.organization.OrganizationRepository;
 import com.example.ledgerlift.mapper.EventMapper;
 import com.example.ledgerlift.utils.Utils;
@@ -187,7 +188,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void uploadImages(String uuid, List<String> images) {
+    public void uploadImages(String uuid, List<ImageRequest> images) {
 
     }
 

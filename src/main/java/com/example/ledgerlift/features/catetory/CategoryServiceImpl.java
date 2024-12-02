@@ -22,7 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
 
     @Override
-    public void createCategory(CategoryRequest request) {
+    public CategoryResponse createCategory(CategoryRequest request) {
 
         Category category = mapper.fromCategoryRequest(request);
 
@@ -36,6 +36,8 @@ public class CategoryServiceImpl implements CategoryService {
         category.setUuid(Utils.generateUuid());
 
         repository.save(category);
+
+        return mapper.toCategoryResponse(category);
 
     }
 

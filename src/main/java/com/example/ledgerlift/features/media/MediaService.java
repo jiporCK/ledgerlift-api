@@ -10,7 +10,13 @@ public interface MediaService {
 
     MediaResponse uploadSingle(MultipartFile file, String s);
 
-    void uploadMultiple(String eventUuid, List<MultipartFile> files, String s);
+    List<MediaResponse> uploadMultiple(String eventUuid, List<MultipartFile> files, String s);
 
     BasedMessage deleteMediaByName(String mediaName);
+
+    List<MediaResponse> loadAllMedias();
+
+    MediaResponse getMediaByName(String mediaName);
+
+    List<MediaResponse> getMediaByEvent(String uuid);
 }

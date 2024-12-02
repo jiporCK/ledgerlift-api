@@ -3,6 +3,7 @@ package com.example.ledgerlift.features.organization;
 import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.mail.MailService;
+import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
 import com.example.ledgerlift.features.user.UserRepository;
@@ -64,6 +65,8 @@ public class OrganizationServiceImpl implements OrganizationService {
 
         List<Organization> organizations = organizationRepository.findAll();
 
+        log.info("Organizations : {}", organizations.size());
+
         return organizationMapper.toOrganizationResponseList(organizations);
     }
 
@@ -92,7 +95,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     }
 
     @Override
-    public void uploadQrImage(String organizationUuid, String qrImage) {
+    public void uploadQrImage(String organizationUuid, ImageRequest qrImage) {
 
         Organization organization = organizationRepository.findByUuid(organizationUuid)
                 .orElseThrow(
@@ -102,7 +105,7 @@ public class OrganizationServiceImpl implements OrganizationService {
                         )
                 );
 
-        organization.setMoneyQRCode(qrImage);
+        organization.setMoneyQRCode(qrImage.image());
 
     }
 

@@ -3,6 +3,7 @@ package com.example.ledgerlift.features.organization;
 import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.features.mail.MailService;
+import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
 import jakarta.validation.Valid;
@@ -47,7 +48,7 @@ public class OrganizationController {
 
     @PutMapping("/{organizationUuid}/upload-qr")
     public void uploadMoneyQrCode(@PathVariable String organizationUuid,
-                                  @Valid @RequestBody String qrImage) {
+                                  @Valid @RequestBody ImageRequest qrImage) {
 
         organizationService.uploadQrImage(organizationUuid, qrImage);
 

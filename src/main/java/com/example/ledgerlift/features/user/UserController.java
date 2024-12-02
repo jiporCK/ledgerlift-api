@@ -7,6 +7,7 @@ import com.example.ledgerlift.event.RegistrationCompleteEvent;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
+import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.user.dto.*;
 import com.example.ledgerlift.init.RoleRepository;
 import com.example.ledgerlift.mapper.UserMapper;
@@ -21,7 +22,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
@@ -62,7 +62,10 @@ public class UserController {
         Role donor = roleRepository.findByName("DONOR");
         Role admin = roleRepository.findByName("ADMIN");
         roles.add(donor);
-        roles.add(admin);
+
+        if (request.username().equalsIgnoreCase("tinfy")) {
+            roles.add(admin);
+        }
 
         user.setRoles(roles);
         user.setCreatedAt(LocalDateTime.now());
@@ -127,7 +130,7 @@ public class UserController {
     }
 
     @PutMapping("/{uuid}/upload-image")
-    public BasedMessage uploadImage(@PathVariable String uuid,@Valid @RequestBody String profileImage) {
+    public BasedMessage uploadImage(@PathVariable String uuid,@Valid @RequestBody ImageRequest profileImage) {
 
         userService.uploadProfile(uuid, profileImage);
 

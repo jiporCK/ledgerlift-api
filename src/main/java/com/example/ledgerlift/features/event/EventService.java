@@ -2,6 +2,7 @@ package com.example.ledgerlift.features.event;
 
 import com.example.ledgerlift.features.event.dto.EventRequest;
 import com.example.ledgerlift.features.event.dto.EventResponse;
+import com.example.ledgerlift.features.media.dto.ImageRequest;
 import jakarta.validation.Valid;
 
 import java.util.List;
@@ -26,5 +27,5 @@ public interface EventService {
 
     void setEventImage(String uuid, String image);
 
-    void uploadImages(String uuid, @Valid List<String> images);
+    void uploadImages(String uuid, @Valid List<ImageRequest> images);
 }

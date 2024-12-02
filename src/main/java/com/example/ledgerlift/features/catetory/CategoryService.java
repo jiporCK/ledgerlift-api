@@ -7,7 +7,7 @@ import jakarta.validation.Valid;
 
 public interface CategoryService {
 
-    void createCategory(CategoryRequest request);
+    CategoryResponse createCategory(CategoryRequest request);
 
     CategoryResponse getCategoryByName(String categoryName);
 

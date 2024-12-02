@@ -2,9 +2,12 @@ package com.example.ledgerlift.features.media;
 
 import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.features.media.dto.MediaResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,13 +26,12 @@ public class MediaController {
         return mediaService.uploadSingle(file, "");
     }
 
-    @PostMapping("/{eventUuid}/upload-multiple")
-    BasedMessage uploadMultiple(@PathVariable String eventUuid,
-                                @RequestBody List<MultipartFile> files) {
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/upload-multiple/{eventUuid}")
+    List<MediaResponse> uploadMultiple(@PathVariable String eventUuid,
+                                       @Valid @RequestBody List<MultipartFile> files) {
 
-        mediaService.uploadMultiple(eventUuid, files, "");
-
-        return new BasedMessage("Successfully uploaded multiple files");
+        return mediaService.uploadMultiple(eventUuid, files, "");
 
     }
 
@@ -38,6 +40,27 @@ public class MediaController {
     public BasedMessage deleteMediaByName(@PathVariable String mediaName) {
 
         return mediaService.deleteMediaByName(mediaName);
+
+    }
+
+    @GetMapping
+    public List<MediaResponse> getMediaByEvent() {
+
+        return mediaService.loadAllMedias();
+
+    }
+
+    @GetMapping("/get-by-name/{mediaName}")
+    public MediaResponse getMediaByName(@PathVariable String mediaName) {
+
+        return mediaService.getMediaByName(mediaName);
+
+    }
+
+    @GetMapping("/get-media-by-event/{uuid}")
+    public List<MediaResponse> getMediaByEvent(@PathVariable String uuid) {
+
+        return mediaService.getMediaByEvent(uuid);
 
     }
 

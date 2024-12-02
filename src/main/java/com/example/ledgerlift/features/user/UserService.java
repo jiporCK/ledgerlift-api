@@ -2,6 +2,7 @@ package com.example.ledgerlift.features.user;
 
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
+import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.user.dto.RegistrationRequest;
 import com.example.ledgerlift.features.user.dto.UserDetail;
 import com.example.ledgerlift.features.user.dto.UserResponse;
@@ -17,7 +18,7 @@ public interface UserService {
 
     UserResponse getUserByUuid(String uuid);
 
-    void uploadProfile(String uuid, String profile);
+    void uploadProfile(String uuid, ImageRequest profile);
 
     String validateVerificationToken(String token);
 
