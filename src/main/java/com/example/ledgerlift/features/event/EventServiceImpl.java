@@ -10,7 +10,6 @@ import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.organization.OrganizationRepository;
 import com.example.ledgerlift.mapper.EventMapper;
 import com.example.ledgerlift.utils.Utils;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -172,7 +171,7 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public void setEventImage(String uuid, String image) {
+    public void setEventImage(String uuid, ImageRequest image) {
 
         Event event = eventRepository.findByUuid(uuid)
                 .orElseThrow(
@@ -182,13 +181,8 @@ public class EventServiceImpl implements EventService {
                         )
                 );
 
-        event.setImage(image);
+        event.setImage(image.image());
         eventRepository.save(event);
-
-    }
-
-    @Override
-    public void uploadImages(String uuid, List<ImageRequest> images) {
 
     }
 

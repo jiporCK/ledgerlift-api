@@ -25,7 +25,6 @@ public interface EventService {
 
     void hideEventByUuid(String uuid);
 
-    void setEventImage(String uuid, String image);
+    void setEventImage(String uuid, ImageRequest image);
 
-    void uploadImages(String uuid, @Valid List<ImageRequest> images);
 }

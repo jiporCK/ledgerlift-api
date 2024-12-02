@@ -68,7 +68,7 @@ public class EventController {
     @ResponseStatus(HttpStatus.OK)
     @PutMapping("/{uuid}/upload-image")
     public void updateEventImage(@PathVariable String uuid,
-                                 @Valid @RequestBody String image) {
+                                 @Valid @RequestBody ImageRequest image) {
 
         eventService.setEventImage(uuid, image);
 
@@ -82,16 +82,6 @@ public class EventController {
         return BasedMessage.builder()
                 .message("Event deleted successfully")
                 .build();
-
-    }
-
-    @PostMapping("/{uuid}/upload-images")
-    public BasedMessage uploadEventImages(@PathVariable String uuid,
-                                          @Valid @RequestBody List<ImageRequest> images) {
-
-        eventService.uploadImages(uuid, images);
-
-        return new BasedMessage("Images uploaded successfully");
 
     }
 
