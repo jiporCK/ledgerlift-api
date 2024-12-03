@@ -10,6 +10,8 @@ public record UserResponse(
 
         String lastName,
 
+        String gender,
+
         String username,
 
         String password,

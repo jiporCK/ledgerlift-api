@@ -14,6 +14,9 @@ public record RegistrationRequest(
         @NotBlank(message = "Last name is required")
         String lastName,
 
+        @NotBlank(message = "Gender is required")
+        String gender,
+
         @NotBlank(message = "Phone number is required")
         String phoneNumber,
 
