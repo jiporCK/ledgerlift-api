@@ -7,8 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
+import org.checkerframework.checker.formatter.qual.Format;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -41,7 +44,12 @@ public class User extends Auditable {
     @Column(unique = true, nullable = false)
     private String email;
 
+    private String gender;
+
     private String avatar;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date dateOfBirth;
 
     private Boolean isProfiledVisibility;
 
@@ -53,30 +61,15 @@ public class User extends Auditable {
 
     private LocalDateTime lastLoginAt;
 
-    /**
-     * Indicates whether the user's account is expired.
-     */
     private boolean isAccountNonExpired;
 
-    /**
-     * Indicates whether the user's account is locked.
-     */
     private boolean isAccountNonLocked;
 
-    /**
-     * Indicates whether the user's credentials are expired.
-     */
     private boolean isCredentialsNonExpired;
 
-    /**
-     * Indicates whether the user's account is bloStringcked.
-     */
     @Column(nullable = false)
     private Boolean isBlocked;
 
-    /**
-     * Indicates whether the user's account is deleted.
-     */
     private boolean isDeleted;
 
     @OneToMany(mappedBy = "user")

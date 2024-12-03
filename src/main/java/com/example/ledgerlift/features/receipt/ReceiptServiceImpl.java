@@ -68,12 +68,8 @@ public class ReceiptServiceImpl implements ReceiptService {
 
         mailService.sendDonationReceipt(user, receipt);
 
-        BigDecimal currentAmount = event.getCurrentAmount();
-        event.setCurrentAmount(currentAmount.add(request.amount()));
-
-        if (event.getGoalAmount().equals(event.getCurrentAmount())) {
-            event.setIsCompleted(true);
-        }
+        BigDecimal raised = event.getCurrentRaised();
+        event.setCurrentRaised(raised.add(request.amount()));
 
         eventRepository.save(event);
 

@@ -15,6 +15,7 @@ public interface UserMapper {
 
     @Mapping(source = "firstName", target = "firstName")
     @Mapping(source = "lastName", target = "lastName")
+    @Mapping(source = "dateOfBirth", target = "dateOfBirth")
     User fromUserCreateRequest(RegistrationRequest registrationRequest);
 
     List<UserResponse> toUserResponseList(List<User> users);

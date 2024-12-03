@@ -1,5 +1,7 @@
 package com.example.ledgerlift.features.user.dto;
 
+import java.util.Date;
+
 public record UserResponse(
 
         String uuid,
@@ -17,6 +19,8 @@ public record UserResponse(
         String email,
 
         String avatar,
+
+        Date dateOfBirth,
 
         Boolean isProfiledVisibility,
 

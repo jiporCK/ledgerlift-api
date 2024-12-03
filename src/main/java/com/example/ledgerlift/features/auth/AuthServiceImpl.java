@@ -5,10 +5,14 @@ import com.example.ledgerlift.features.auth.dto.AuthResponse;
 import com.example.ledgerlift.features.auth.dto.LoginRequest;
 import com.example.ledgerlift.features.auth.dto.RefreshTokenRequest;
 import com.example.ledgerlift.features.auth.jwt_token.TokenService;
+import com.example.ledgerlift.features.ca.CAService;
+import com.example.ledgerlift.features.ca.dto.CAEnrollmentRequest;
 import com.example.ledgerlift.features.user.UserRepository;
 import com.example.ledgerlift.security.CustomUserDetails;
+import com.example.ledgerlift.utils.Utils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hyperledger.fabric.gateway.Wallet;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -31,6 +35,8 @@ public class AuthServiceImpl implements AuthService{
     private final DaoAuthenticationProvider daoAuthenticationProvider;
     private final TokenService tokenService;
     private final UserRepository userRepository;
+    private final CAService caService;
+    private Wallet wallet;
 
     @Override
     public AuthResponse login(LoginRequest request) {
@@ -69,6 +75,31 @@ public class AuthServiceImpl implements AuthService{
 
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
+
+        try {
+
+            CAEnrollmentRequest caEnrollmentRequest = CAEnrollmentRequest.builder()
+                    .username("donor" + user.getUuid())
+                    .affiliation("org1.department1")
+                    .type("client")
+                    .secret(Utils.generateUuid())
+                    .orgName("Org1")
+                    .genSecret(true)
+                    .registrarUsername("admin")
+                    .build();
+
+            caService.registerAndEnrollUser(caEnrollmentRequest.getUsername(), caEnrollmentRequest);
+
+        } catch (ResponseStatusException e) {
+            // If the exception is related to already registered or enrolled user, allow the login to proceed
+            if (!e.getMessage().contains("already enrolled")) {
+                throw e;  // Rethrow if it's a different error
+            }
+            log.warn("User {} already enrolled, proceeding with login.", user.getUuid());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
 
         return tokenService.createToken(userDetails.getUser(), auth) ;
     }

@@ -27,9 +27,9 @@ public class Event {
 
     private String description;
 
-    private BigDecimal goalAmount;
+    private String location;
 
-    private BigDecimal currentAmount;
+    private BigDecimal currentRaised;
 
     private LocalDateTime startDate;
 

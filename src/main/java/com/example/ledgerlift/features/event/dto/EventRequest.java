@@ -15,9 +15,9 @@ public record EventRequest(
         @Size(max = 200,message = "Description must not exceed 200 characters")
         String description,
 
-        @NotNull(message = "Goal amount is required")
-        @Positive(message = "Goal amount must be greater than zero")
-        BigDecimal goalAmount
+        @NotBlank(message = "Location is required")
+        @Size(max = 50)
+        String location
 
 ) {
 }

@@ -1,317 +1,133 @@
 package com.example.ledgerlift.features.ca;
 
-import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.ca.dto.CAEnrollmentRequest;
-
-import com.example.ledgerlift.features.user.UserRepository;
 import com.example.ledgerlift.utils.FabricUtils;
+import com.example.ledgerlift.utils.Utils;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.hyperledger.fabric.gateway.*;
+import org.hyperledger.fabric.gateway.Identities;
+import org.hyperledger.fabric.gateway.Wallet;
+import org.hyperledger.fabric.gateway.Wallets;
+import org.hyperledger.fabric.gateway.X509Identity;
 import org.hyperledger.fabric.sdk.Enrollment;
 import org.hyperledger.fabric.sdk.security.CryptoSuite;
 import org.hyperledger.fabric_ca.sdk.EnrollmentRequest;
 import org.hyperledger.fabric_ca.sdk.HFCAClient;
 import org.hyperledger.fabric_ca.sdk.RegistrationRequest;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.io.File;
 import java.nio.file.Paths;
 import java.security.PrivateKey;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class CAService {
 
-    private final UserRepository userRepository;
+    // Constants for organization MSP and profile
+    private static final String ORG1_MSP = "Org1MSP";
+    private static final String PROFILE_TLS = "tls";
+    private static final String ADMIN_LABEL = "admin";
+    private static final String DONOR_LABEL = "donor";
+
     @Value("${fabric.ca.org1.caUrl}")
     private String org1CaUrl;
+
     @Value("${fabric.ca.org1.certificatePath}")
     private String org1CertificatePath;
+
     @Value("${fabric.wallet.config-path}")
     private String walletPath;
-    private Wallet wallet;
 
     @Value("${fabric.ca.tls.enabled}")
     private Boolean tlsEnabled;
 
-    // Only for testing
     @Value("${fabric.ca.admin.username}")
     private String adminUsername;
+
     @Value("${fabric.ca.admin.password}")
     private String adminPassword;
 
+    private Wallet wallet;
+
     @PostConstruct
     public void init() throws Exception {
-        // Initialize wallet
-        this.wallet = Wallets.newFileSystemWallet(Paths.get(walletPath));
+        // Initialize the wallet to store user identities
+        wallet = Wallets.newFileSystemWallet(Paths.get(walletPath));
 
-        // Check if admin identity exists in the wallet
-        if (!FabricUtils.checkIdentityExistence("admin", wallet)) {
-            log.info("Admin identity does not exist in wallet. Creating admin identity.");
-            createAdminUserOrg1();
-            CAEnrollmentRequest request = CAEnrollmentRequest.builder()
-                    .username("client1")
-                    .affiliation("org1.department1")
-                    .type("client")
-                    .secret("user1pw")
-                    .registrarUsername("admin")
-                    .build();
-            registerAndEnrollAdminUser(request);
+        // Check if the admin identity exists in the wallet
+        if (!FabricUtils.checkIdentityExistence(ADMIN_LABEL, wallet)) {
+            log.info("Admin identity not found in wallet. Creating admin identity.");
+            createAdminUser();  // Create and store the admin identity
+            registerAndEnrollDefaultAdmin();  // Register and enroll the default admin user
         } else {
-            log.info("Admin identity already exists in wallet.");
+            log.info("Admin identity already exists in the wallet.");
         }
     }
 
+    /**
+     * Create the admin user and store its identity in the wallet.
+     */
+    private void createAdminUser() throws Exception {
+        // Setup the Fabric CA client
+        HFCAClient caClient = setupHFCAClient();
 
-//    @PostConstruct
-//    public void init() throws Exception {
-//
-//        // create wallet instance
-//        this.wallet = Wallets.newFileSystemWallet(
-//                Paths.get(walletPath));
-//
-//        // check identity if exists
-//        if (FabricUtils.checkIdentityExistence(
-//                "admin", wallet
-//        )){
-//            log.info("Admin already exists in wallet");
-//        } else {
-//            log.info("Identity already exists in wallet !");
-//        }
-//        // create admin first, in order to register and enroll the user
-//        createAdminUserOrg1();
-//
-//        // Create a new user
-//        CAEnrollmentRequest request = CAEnrollmentRequest.builder()
-//                .username("client1")
-//                .affliation("org1.department1")
-//                .type("client")
-//                .secret("user1pw")
-//                .registrarUsername("admin")
-//                .build();
-//        registerAndEnrollUser(request);
-//
-//    }
+        // Enroll the admin user with the CA
+        Enrollment enrollment = caClient.enroll(adminUsername, adminPassword, new EnrollmentRequest());
 
-    private void registerAndEnrollAdminUser(CAEnrollmentRequest request) throws Exception {
+        // Read the certificate and store the admin identity in the wallet
+        var certificate = Identities.readX509Certificate(enrollment.getCert());
+        var adminIdentity = Identities.newX509Identity(ORG1_MSP, certificate, enrollment.getKey());
 
-        // HFCA client
-        var props = new Properties();
-        FabricUtils.setTlsProps(
-                props,
-                org1CertificatePath,
-                tlsEnabled);
-
-        var caClient = HFCAClient.createNewInstance(
-                org1CaUrl,
-                props);
-        caClient.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
-
-        // 1. register
-        var registrationRequest = new RegistrationRequest(
-                request.getUsername());
-        registrationRequest.setAffiliation(request.getAffiliation());
-        registrationRequest.setType("client");
-        // we also have the auto generate the secret if the user doens't prvoide us the
-        // secret
-        registrationRequest.setSecret(request.getSecret());
-        registrationRequest.setMaxEnrollments(-1); // unlimited enrollments\
-
-        var adminIdentity = wallet.get("admin");
-        if(adminIdentity == null) {
-            throw new IllegalAccessException(
-                    "Admin identity not found in the wallet"
-            );
-        }
-
-        // 1.1 getting the registrar
-        var adminUser = new org.hyperledger.fabric.sdk.User() {
-
-            final X509Identity x509Identity = (X509Identity) adminIdentity;
-
-            @Override
-            public String getName() {
-                return "admin";
-            }
-
-            @Override
-            public Set<String> getRoles() {
-                return null;
-            }
-
-            @Override
-            public String getAccount() {
-                return null;
-            }
-
-            @Override
-            public String getAffiliation() {
-                return request.getAffiliation();
-            }
-
-            @Override
-            public Enrollment getEnrollment() {
-                return new Enrollment() {
-
-                    @Override
-                    public PrivateKey getKey() {
-                        return x509Identity.getPrivateKey();
-                    }
-
-                    @Override
-                    public String getCert() {
-                        return Identities.toPemString(x509Identity.getCertificate());
-                    }
-
-                };
-            }
-
-            @Override
-            public String getMspId() {
-                return "Org1MSP";
-            }
-
-        };
-        // register the user
-        caClient.register(registrationRequest,
-                adminUser);
-        log.info("Successfully Register a new User :{}", request.getUsername());
-        // 2. enroll
-        var enrollmentRequest = new EnrollmentRequest();
-        enrollmentRequest.setProfile("tls");
-        enrollmentRequest.addHost("localhost");
-
-        var enrollment = caClient.enroll(
-                request.getUsername(),
-                request.getSecret(),
-                enrollmentRequest);
-        // 3. add to wallet
-
-        var certificate = Identities.readX509Certificate(
-                enrollment.getCert());
-        var userIdentity = Identities.newX509Identity(
-                "Org1MSP", certificate, enrollment.getKey());
-
-        wallet.put("client1", userIdentity);
-
+        wallet.put(ADMIN_LABEL, adminIdentity);
+        log.info("Admin identity stored in wallet.");
     }
 
-    // private void storeIdentityToWallet(String label , )
-    private void createAdminUserOrg1() throws Exception {
-
-        // 1. create enrollment request
-        var enrollmentRequest = new EnrollmentRequest();
-        // enrollmentRequest.addAttrReq(); // used in future for attributes
-        enrollmentRequest.setProfile("tls");
-        enrollmentRequest.addHost("localhost");
-
-        // 2. Setup HFCAClient
-        var props = new Properties();
-        if (tlsEnabled) {
-            // we will configure the tls properties for the HFCA client
-            // 2.1. configure tls
-            File pemFile = new File(org1CertificatePath);
-            if (!pemFile.exists()) {
-                throw new Exception("Certificate org1 CA file does not exist");
-            }
-            // verify the type of the certificate && validity of the certificate
-            props.setProperty("pemFile", org1CertificatePath);
-            props.setProperty("allowAllHostNames", "true");
-            // 2.2. configure the timeout
-            props.put("connectTimeout", "30000");
-            props.put("readTimeout", "30000");
-        }
-        var caClient = HFCAClient.createNewInstance(
-                org1CaUrl,
-                props);
-        caClient.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
-
-        var enrollment = caClient.enroll(
-                adminUsername,
-                adminPassword,
-                enrollmentRequest);
-
-        var certificate = Identities.readX509Certificate(
-                enrollment.getCert());
-        var adminIdentity = Identities.newX509Identity(
-                "Org1MSP", certificate, enrollment.getKey());
-
-        wallet.put("admin", adminIdentity);
-        log.info("Successfully store the identity to the wallet !  ");
-    }
-
-    public void registerAndEnrollUser(String userUuid, CAEnrollmentRequest request) throws Exception {
-
-        User user = userRepository.findByUuid(userUuid)
-                .orElseThrow(
-                        () -> new ResponseStatusException(
-                                HttpStatus.BAD_REQUEST,
-                                "User has not been found"
-                        )
-                );
-
-        // HFCA client
-        var props = new Properties();
+    /**
+     * Set up the Hyperledger Fabric CA client with TLS properties.
+     */
+    private HFCAClient setupHFCAClient() throws Exception {
+        Properties props = new Properties();
         FabricUtils.setTlsProps(props, org1CertificatePath, tlsEnabled);
 
-        var caClient = HFCAClient.createNewInstance(org1CaUrl, props);
+        HFCAClient caClient = HFCAClient.createNewInstance(org1CaUrl, props);
         caClient.setCryptoSuite(CryptoSuite.Factory.getCryptoSuite());
+        return caClient;
+    }
 
-        // 1. register
-        var registrationRequest = new RegistrationRequest(user.getUsername());
-        registrationRequest.setAffiliation(request.getAffiliation());
-        registrationRequest.setType(request.getType());
-
-        if (request.getSecret() == null || request.getSecret().isEmpty()) {
-            if (request.getGenSecret()) {
-                String generatedSecret = generateSecret();
-                request.setSecret(generatedSecret);
-                log.info("Generated secret: {}", generatedSecret);
-            } else {
-                throw new IllegalArgumentException("Secret must be provided if genSecret is false");
-            }
+    /**
+     * Retrieve the admin user from the wallet and return it as a Fabric SDK User object.
+     */
+    private org.hyperledger.fabric.sdk.User getAdminUser() throws Exception {
+        var adminIdentity = wallet.get(ADMIN_LABEL);
+        if (adminIdentity == null) {
+            throw new IllegalStateException("Admin identity not found in wallet.");
         }
-        registrationRequest.setSecret(request.getSecret());
 
+        X509Identity x509Identity = (X509Identity) adminIdentity;
 
-        registrationRequest.setMaxEnrollments(-1); // unlimited enrollments if needed
-
-        var adminIdentity = wallet.get("admin");
-        if (adminIdentity == null)
-            throw new Exception("Admin identity not found in the wallet");
-
-        // 1.1 getting the registrar
-        var adminUser = new org.hyperledger.fabric.sdk.User() {
-
-            final X509Identity x509Identity = (X509Identity) adminIdentity;
-
+        return new org.hyperledger.fabric.sdk.User() {
             @Override
             public String getName() {
-                return "admin";
+                return ADMIN_LABEL;
             }
 
             @Override
             public Set<String> getRoles() {
-                return null;
+                return null;  // No roles specified
             }
 
             @Override
             public String getAccount() {
-                return null;
+                return null;  // No account specified
             }
 
             @Override
             public String getAffiliation() {
-                return request.getAffiliation();
+                return "org1.department1";
             }
 
             @Override
@@ -331,29 +147,62 @@ public class CAService {
 
             @Override
             public String getMspId() {
-                return "Org1MSP";
+                return ORG1_MSP;
             }
         };
+    }
 
-        // register the user
-        caClient.register(registrationRequest, adminUser);
-        log.info("Successfully registered a new user: {}", request.getUsername());
+    /**
+     * Register and enroll the default admin user.
+     */
+    private void registerAndEnrollDefaultAdmin() throws Exception {
+        CAEnrollmentRequest request = CAEnrollmentRequest.builder()
+                .username("jipor")
+                .affiliation("org1.department1")
+                .type("adminOrg")
+                .secret(Utils.generateUuid())  // Generate a random secret for the admin user
+                .registrarUsername(ADMIN_LABEL)
+                .genSecret(true)
+                .build();
 
-        // 2. enroll
-        var enrollmentRequest = new EnrollmentRequest();
-        enrollmentRequest.setProfile("tls");
-        enrollmentRequest.addHost("localhost");
+        registerAndEnrollUser(request.getUsername(), request);
+    }
 
-        var enrollment = caClient.enroll(request.getUsername(), request.getSecret(), enrollmentRequest);
+    /**
+     * Register and enroll a user with the specified enrollment request.
+     */
+    public void registerAndEnrollUser(String username, CAEnrollmentRequest request) throws Exception {
+        // Check if the user's identity already exists in the wallet
+        if (wallet.get(username) != null) {
+            log.info("User {} is already enrolled and exists in the wallet.", username);
+            return; // Skip registration and enrollment
+        }
 
-        // 3. add to wallet
+        HFCAClient caClient = setupHFCAClient(); // Initialize the CA client
+
+        // Create a registration request
+        RegistrationRequest regRequest = new RegistrationRequest(username);
+        regRequest.setAffiliation(request.getAffiliation()); // Set user's organization affiliation
+        regRequest.setType(request.getType());               // Set the user type (e.g., client)
+        regRequest.setSecret(request.getSecret());           // Set the secret for enrollment
+        regRequest.setMaxEnrollments(-1);                    // Allow unlimited enrollments
+
+        // Register the user using the admin identity
+        org.hyperledger.fabric.sdk.User adminUser = getAdminUser(); // Get admin credentials
+        try {
+            caClient.register(regRequest, adminUser);
+            log.info("User {} registered successfully.", username);
+        } catch (Exception e) {
+            log.warn("User {} might already be registered: {}", username, e.getMessage());
+        }
+
+        // Enroll the user to get a certificate and key pair
+        Enrollment enrollment = caClient.enroll(username, request.getSecret(), new EnrollmentRequest());
         var certificate = Identities.readX509Certificate(enrollment.getCert());
         var userIdentity = Identities.newX509Identity("Org1MSP", certificate, enrollment.getKey());
 
-        wallet.put("client1", userIdentity);
-    }
-
-    private String generateSecret() {
-        return UUID.randomUUID().toString();
+        // Store the identity in the wallet
+        wallet.put(username, userIdentity);
+        log.info("User {} enrolled and added to the wallet.", username);
     }
 }

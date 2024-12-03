@@ -12,7 +12,6 @@ public class CAEnrollmentRequest {
 
     private String username;
 
-    @Column(nullable = true)
     private String secret;
 
     private String affiliation; // org1.department1

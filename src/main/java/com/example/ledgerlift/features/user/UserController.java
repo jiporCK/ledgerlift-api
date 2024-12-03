@@ -4,6 +4,8 @@ import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.domain.Role;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.event.RegistrationCompleteEvent;
+import com.example.ledgerlift.features.ca.CAService;
+import com.example.ledgerlift.features.ca.dto.CAEnrollmentRequest;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
@@ -40,6 +42,7 @@ public class UserController {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final CAService caService;
 
     @GetMapping("/me")
     public UserDetail me(Authentication authentication) {
@@ -76,11 +79,11 @@ public class UserController {
 
         userRepository.save(user);
 
-        VerificationToken token = new VerificationToken(MailUtils.generateDigitsToken(), VerificationToken.TokenType.EMAIL_VERIFICATION);
-        token.setUser(user);
-        verificationTokenRepository.save(token);
+//        VerificationToken token = new VerificationToken(MailUtils.generateDigitsToken(), VerificationToken.TokenType.EMAIL_VERIFICATION);
+//        token.setUser(user);
+//        verificationTokenRepository.save(token);
 
-        user.setTokens(new ArrayList<>(List.of(token)));
+//        user.setTokens(new ArrayList<>(List.of(token)));
         userRepository.save(user);
 
         log.info("User: {}", user);
@@ -106,7 +109,9 @@ public class UserController {
         if (validatedToken.equals("valid")) {
             user.setIsEmailVerified(true);
             userRepository.save(user);
+
             mailService.welcomeMessage(user);
+
             return RegistrationResponse.builder()
                     .message("Registration successfully")
                     .user(userMapper.toUserResponse(user))

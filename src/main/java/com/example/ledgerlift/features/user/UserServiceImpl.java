@@ -2,7 +2,6 @@ package com.example.ledgerlift.features.user;
 
 import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.domain.User;
-import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
 import com.example.ledgerlift.features.media.dto.ImageRequest;
@@ -16,11 +15,11 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Date;
 import java.util.List;
 
 @Service
@@ -31,8 +30,6 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final VerificationTokenRepository verificationTokenRepository;
-    private final JavaMailSender mailSender;
-    private final MailService mailService;
     private final PasswordEncoder passwordEncoder;
 
     @Override

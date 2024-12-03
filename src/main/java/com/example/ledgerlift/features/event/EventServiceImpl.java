@@ -124,7 +124,6 @@ public class EventServiceImpl implements EventService {
 
         event.setName(request.name());
         event.setDescription(request.description());
-        event.setGoalAmount(request.goalAmount());
 
         eventRepository.save(event);
     }
