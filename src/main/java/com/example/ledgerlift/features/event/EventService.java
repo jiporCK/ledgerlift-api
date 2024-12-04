@@ -27,4 +27,7 @@ public interface EventService {
 
     void setEventImage(String uuid, ImageRequest image);
 
+    List<EventResponse> getUrgentEvents();
+
+    void setUrgentEvent(String uuid);
 }

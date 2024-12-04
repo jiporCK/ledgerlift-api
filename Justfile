@@ -10,7 +10,13 @@ network option:
             ;;
         "down")
             echo "🔥 Bringing down the network 🔥"
-            cd fabric-samples/test-network && bash  network.sh down
+            cd fabric-samples/test-network && bash network.sh down
+            ;;
+        "restart")
+            echo "🔥 Restarting the network 🔥"
+            cd fabric-samples/test-network && bash network.sh down
+            echo "🔥 Bringing up the network again 🔥"
+            bash network.sh up
             ;;
         *)
             echo " just network up|down 👍"

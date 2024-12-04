@@ -3,6 +3,8 @@ package com.example.ledgerlift.features.organization;
 import com.example.ledgerlift.domain.Event;
 import com.example.ledgerlift.domain.Organization;
 import com.example.ledgerlift.domain.User;
+import com.example.ledgerlift.features.ca.CAService;
+import com.example.ledgerlift.features.ca.dto.CAEnrollmentRequest;
 import com.example.ledgerlift.features.event.EventRepository;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.media.dto.ImageRequest;
@@ -30,6 +32,7 @@ public class OrganizationServiceImpl implements OrganizationService {
     private final OrganizationMapper organizationMapper;
     private final MailService mailService;
     private final EventRepository eventRepository;
+    private final CAService caService;
 
     @Override
     public void createOrganization(String userUuid, OrganizationRequest request) {
@@ -152,6 +155,56 @@ public class OrganizationServiceImpl implements OrganizationService {
 
             eventRepository.saveAll(events);
         }
+    }
+
+    @Override
+    public List<OrganizationResponse> getPendingOrganization() {
+
+        List<Organization> organizations = organizationRepository.findAll()
+                .stream().filter(
+                        org -> org.getIsApproved().equals(Boolean.FALSE)
+                ).toList();
+
+        return organizationMapper.toOrganizationResponseList(organizations);
+    }
+
+    @Override
+    public void approveOrg(String organizationUuid) {
+
+        Organization organization = organizationRepository.findByUuid(organizationUuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Organization with uuid " + organizationUuid + " not found"
+                        )
+                );
+
+        organizationRepository.approveByUuid(organizationUuid);
+
+        try {
+
+            CAEnrollmentRequest caEnrollmentRequest = CAEnrollmentRequest.builder()
+                    .username("organization" + organization.getUuid())
+                    .affiliation("org1.department1")
+                    .type("client")
+                    .secret(Utils.generateUuid())
+                    .orgName("Org1")
+                    .genSecret(true)
+                    .registrarUsername("admin")
+                    .build();
+
+            caService.registerAndEnrollUser(caEnrollmentRequest.getUsername(), caEnrollmentRequest);
+
+        } catch (ResponseStatusException e) {
+            // If the exception is related to already registered or enrolled user, allow the login to proceed
+            if (!e.getMessage().contains("already enrolled")) {
+                throw e;  // Rethrow if it's a different error
+            }
+            log.warn("User {} already enrolled, proceeding with login.", organization.getUuid());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
 }

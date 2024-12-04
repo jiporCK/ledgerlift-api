@@ -40,6 +40,9 @@ public class Organization extends Auditable {
     @Column(nullable = false)
     private Boolean isLocked;
 
+    @Column(nullable = false)
+    private Boolean isApproved;
+
     @ManyToOne
     private User user;
 

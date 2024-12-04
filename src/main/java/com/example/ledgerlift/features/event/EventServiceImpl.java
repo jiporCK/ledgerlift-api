@@ -10,6 +10,8 @@ import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.organization.OrganizationRepository;
 import com.example.ledgerlift.mapper.EventMapper;
 import com.example.ledgerlift.utils.Utils;
+import com.google.api.Http;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -57,9 +59,7 @@ public class EventServiceImpl implements EventService {
         }
 
         event.setUuid(Utils.generateUuid());
-        event.setStartDate(LocalDateTime.now());
-        event.setEndDate(LocalDateTime.now().plusMonths(1));
-        event.setIsCompleted(false);
+        event.setIsUrgent(false);
         event.setOrganization(organization);
         event.setCategory(category);
 
@@ -91,6 +91,26 @@ public class EventServiceImpl implements EventService {
                     HttpStatus.NOT_FOUND,
                     "There is nothing to show!"
             );
+        }
+
+        return eventMapper.toEventResponseList(events);
+    }
+
+    @Override
+    public List<EventResponse> getUrgentEvents() {
+
+        List<Event> events = eventRepository.findAll().stream()
+                .filter(
+                        event -> event.getIsUrgent().equals(Boolean.TRUE)
+                ).toList();
+
+        if (events.isEmpty()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "There is no urgent event!"
+            );
+
         }
 
         return eventMapper.toEventResponseList(events);
@@ -193,4 +213,20 @@ public class EventServiceImpl implements EventService {
 
     }
 
+    @Transactional
+    @Override
+    public void setUrgentEvent(String uuid) {
+
+        if (!eventRepository.existsByUuid(uuid)) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Event has not been found"
+            );
+
+        }
+
+        eventRepository.makeUrgentByUuid(uuid);
+
+    }
 }

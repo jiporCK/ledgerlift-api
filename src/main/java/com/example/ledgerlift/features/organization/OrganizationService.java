@@ -25,4 +25,9 @@ public interface OrganizationService {
     void uploadQrImage(String organizationUuid, @Valid ImageRequest qrImage);
 
     void lockOrganization(String organizationUuid);
+
+    List<OrganizationResponse> getPendingOrganization();
+
+    void approveOrg(String organizationUuid);
+
 }

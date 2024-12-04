@@ -20,4 +20,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findAllByOrganization(Organization organization);
 
     boolean existsByNameEqualsIgnoreCase(String name);
+
+    boolean existsByUuid(String uuid);
+
+    @Modifying
+    @Query("UPDATE Event e SET e.isUrgent = TRUE WHERE e.uuid = :uuid")
+    void makeUrgentByUuid(String uuid);
 }

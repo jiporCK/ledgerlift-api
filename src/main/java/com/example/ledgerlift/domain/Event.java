@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -31,13 +34,15 @@ public class Event {
 
     private BigDecimal currentRaised;
 
-    private LocalDateTime startDate;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date startDate;
 
-    private LocalDateTime endDate;
-
-    private Boolean isCompleted;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date endDate;
 
     private Boolean isVisible;
+
+    private Boolean isUrgent;
 
     @ManyToOne
     private Organization organization;

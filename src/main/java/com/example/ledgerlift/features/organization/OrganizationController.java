@@ -46,6 +46,13 @@ public class OrganizationController {
 
     }
 
+    @GetMapping("/get-pending-organizations")
+    public List<OrganizationResponse> getPendingOrganizations() {
+
+        return organizationService.getPendingOrganization();
+
+    }
+
     @PutMapping("/{organizationUuid}/upload-qr")
     public void uploadMoneyQrCode(@PathVariable String organizationUuid,
                                   @Valid @RequestBody ImageRequest qrImage) {
@@ -72,6 +79,15 @@ public class OrganizationController {
         organizationService.lockOrganization(organizationUuid);
 
         return new BasedMessage("Organization has been locked");
+
+    }
+
+    @PutMapping("/{organizationUuid}/approve-org")
+    BasedMessage approveOrganization(@PathVariable String organizationUuid) {
+
+        organizationService.approveOrg(organizationUuid);
+
+        return new BasedMessage("Organization has been approved");
 
     }
 

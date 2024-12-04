@@ -41,6 +41,14 @@ public class EventController {
 
     }
 
+    @GetMapping("/urgent-events")
+    public List<EventResponse> getUrgentEvents() {
+
+        return eventService.getUrgentEvents();
+
+    }
+
+
     @GetMapping("/{organizationUuid}")
     public List<EventResponse> getEventsByOrganization(@PathVariable String organizationUuid) {
 
@@ -74,6 +82,14 @@ public class EventController {
 
     }
 
+    @ResponseStatus(HttpStatus.OK)
+    @PutMapping("/{uuid}/urgent")
+    public void updateUrgentEvent(@PathVariable String uuid) {
+
+        eventService.setUrgentEvent(uuid);
+
+    }
+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{eventUuid}")
     public BasedMessage deleteEvent(@PathVariable String eventUuid) {
@@ -85,6 +101,5 @@ public class EventController {
                 .build();
 
     }
-
 
 }
