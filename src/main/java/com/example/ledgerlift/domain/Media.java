@@ -31,4 +31,7 @@ public class Media {
     @ManyToOne
     private Event event;
 
+    @OneToOne
+    private User user;
+
 }

@@ -3,7 +3,7 @@ package com.example.ledgerlift.features.user.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record UserDetail(
+public record UserDetailResponse (
 
         String email,
 

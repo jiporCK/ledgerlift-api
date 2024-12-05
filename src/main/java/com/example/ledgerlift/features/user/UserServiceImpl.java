@@ -1,25 +1,32 @@
 package com.example.ledgerlift.features.user;
 
 import com.example.ledgerlift.base.BasedMessage;
+import com.example.ledgerlift.domain.Media;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
+import com.example.ledgerlift.features.media.MediaRepository;
+import com.example.ledgerlift.features.media.MediaService;
 import com.example.ledgerlift.features.media.dto.ImageRequest;
+import com.example.ledgerlift.features.media.dto.MediaResponse;
 import com.example.ledgerlift.features.user.dto.RegistrationRequest;
-import com.example.ledgerlift.features.user.dto.UserDetail;
+import com.example.ledgerlift.features.user.dto.UserDetailResponse;
 import com.example.ledgerlift.features.user.dto.UserResponse;
 import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
+import com.example.ledgerlift.mapper.MediaMapper;
 import com.example.ledgerlift.mapper.UserMapper;
 import com.example.ledgerlift.utils.Utils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.asn1.cms.MetaData;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -31,6 +38,9 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final VerificationTokenRepository verificationTokenRepository;
     private final PasswordEncoder passwordEncoder;
+    private final MediaRepository mediaRepository;
+    private final MediaMapper mediaMapper;
+    private final MediaService mediaService;
 
     @Override
     public UserResponse createUser(RegistrationRequest request) {
@@ -97,6 +107,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found"));
 
         user.setAvatar(profile.image());
+
+        MediaResponse mediaResponse = mediaService.getMediaByName(profile.image());
+        Media media = mediaMapper.toMediaResponse(mediaResponse);
+        media.setUser(user);
+        mediaRepository.save(media);
+
+        user.setMedia(media);
         userRepository.save(user);
 
         BasedMessage.builder()
@@ -144,6 +161,8 @@ public class UserServiceImpl implements UserService {
                         () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")
                 );
 
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
         user.setUsername(request.username());
         user.setPhoneNumber(request.phoneNumber());
 
@@ -197,7 +216,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDetail getUserInfo(String uuid) {
+    public UserDetailResponse getUserInfo(String uuid) {
 
         User user = userRepository.findByUuid(uuid)
                 .orElseThrow(
@@ -208,4 +227,20 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public void updateUserDOB(String uuid, LocalDateTime birthday) {
+
+        User user = userRepository.findByUuid(uuid)
+                .orElseThrow(
+                        () -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "User has not been found"
+                        )
+                );
+
+        user.setDateOfBirth(birthday);
+
+        userRepository.save(user);
+
+    }
 }

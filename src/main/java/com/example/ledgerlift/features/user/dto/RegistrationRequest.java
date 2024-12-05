@@ -3,9 +3,11 @@ package com.example.ledgerlift.features.user.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 import java.util.Date;
 
+@Builder
 public record RegistrationRequest(
 
         @NotBlank(message = "First name is required")
@@ -14,10 +16,7 @@ public record RegistrationRequest(
         @NotBlank(message = "Last name is required")
         String lastName,
 
-        @NotBlank(message = "Gender is required")
-        String gender,
-
-        @NotBlank(message = "Phone number is required")
+//        @NotBlank(message = "Phone number is required")
         String phoneNumber,
 
         @NotBlank(message = "Username is required")
@@ -29,9 +28,7 @@ public record RegistrationRequest(
 
         @NotBlank(message = "Password is required")
         @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
-        String password,
-
-        Date dateOfBirth
+        String password
 
 ) {
 }

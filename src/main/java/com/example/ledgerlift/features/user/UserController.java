@@ -2,10 +2,9 @@ package com.example.ledgerlift.features.user;
 
 import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.domain.Role;
+import com.example.ledgerlift.domain.SocialLogin;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.event.RegistrationCompleteEvent;
-import com.example.ledgerlift.features.ca.CAService;
-import com.example.ledgerlift.features.ca.dto.CAEnrollmentRequest;
 import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
@@ -13,7 +12,6 @@ import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.user.dto.*;
 import com.example.ledgerlift.init.RoleRepository;
 import com.example.ledgerlift.mapper.UserMapper;
-import com.example.ledgerlift.utils.MailUtils;
 import com.example.ledgerlift.utils.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -25,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,10 +41,9 @@ public class UserController {
     private final UserRepository userRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final VerificationTokenRepository verificationTokenRepository;
-    private final CAService caService;
 
     @GetMapping("/me")
-    public UserDetail me(Authentication authentication) {
+    public UserDetailResponse me(Authentication authentication) {
 
         Jwt jwt = (Jwt) authentication.getPrincipal();
         String uuid = jwt.getClaim("uuid");
@@ -63,10 +61,12 @@ public class UserController {
         List<Role> roles = new ArrayList<>();
         Role donor = roleRepository.findByName("DONOR");
         Role admin = roleRepository.findByName("ADMIN");
+        Role organizer = roleRepository.findByName("ORGANIZER");
         roles.add(donor);
 
         if (request.username().equalsIgnoreCase("tinfy")) {
             roles.add(admin);
+            roles.add(organizer);
         }
 
         user.setRoles(roles);
@@ -77,13 +77,6 @@ public class UserController {
         user.setDeleted(false);
         user.setIsBlocked(false);
 
-        userRepository.save(user);
-
-//        VerificationToken token = new VerificationToken(MailUtils.generateDigitsToken(), VerificationToken.TokenType.EMAIL_VERIFICATION);
-//        token.setUser(user);
-//        verificationTokenRepository.save(token);
-
-//        user.setTokens(new ArrayList<>(List.of(token)));
         userRepository.save(user);
 
         log.info("User: {}", user);
@@ -122,6 +115,7 @@ public class UserController {
                     .token(verificationToken.getToken())
                     .build();
         }
+
         throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND,
                 "Token has not been found"
@@ -177,6 +171,15 @@ public class UserController {
                 .message("User unblocked successfully")
                 .build();
 
+    }
+
+    @PutMapping("/{uuid}/update-dob")
+    public BasedMessage updateDateOfBirth(@PathVariable String uuid,
+                                          @RequestParam LocalDateTime birthday) {
+
+        userService.updateUserDOB(uuid, birthday);
+
+        return new BasedMessage("User updated successfully");
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

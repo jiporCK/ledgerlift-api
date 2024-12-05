@@ -66,7 +66,6 @@ public class MailServiceImpl implements MailService {
                 "<p style=\"font-size: 14px;\">Thank you,<br><strong>Team</strong></p>" +
                 "</div>";
 
-
         MailRequest request = MailRequest.builder()
                 .from(mailFrom)
                 .senderName(senderName)

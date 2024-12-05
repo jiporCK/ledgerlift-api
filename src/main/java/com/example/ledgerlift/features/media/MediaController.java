@@ -4,10 +4,8 @@ import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.features.media.dto.MediaResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -39,7 +37,9 @@ public class MediaController {
     @DeleteMapping("/{mediaName}")
     public BasedMessage deleteMediaByName(@PathVariable String mediaName) {
 
-        return mediaService.deleteMediaByName(mediaName);
+        mediaService.deleteMediaByName(mediaName);
+
+        return new BasedMessage("Media has been deleted");
 
     }
 

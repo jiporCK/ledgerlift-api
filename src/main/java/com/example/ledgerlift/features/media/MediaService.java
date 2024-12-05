@@ -12,7 +12,7 @@ public interface MediaService {
 
     List<MediaResponse> uploadMultiple(String eventUuid, List<MultipartFile> files, String s);
 
-    BasedMessage deleteMediaByName(String mediaName);
+    void deleteMediaByName(String mediaName);
 
     List<MediaResponse> loadAllMedias();
 

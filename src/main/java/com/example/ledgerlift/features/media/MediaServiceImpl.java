@@ -1,6 +1,5 @@
 package com.example.ledgerlift.features.media;
 
-import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.domain.Event;
 import com.example.ledgerlift.domain.Media;
 import com.example.ledgerlift.features.event.EventRepository;
@@ -40,47 +39,6 @@ public class MediaServiceImpl implements MediaService{
     private String baseUri;
 
     @Override
-    public MediaResponse uploadSingle(MultipartFile file, String folderName) {
-
-        String newMediaName = Utils.generateUuid();
-        newMediaName += Utils.extractExtension(file.getOriginalFilename());
-
-        Path directoryPath = Paths.get(serverPath + folderName);
-        if (!Files.exists(directoryPath)) {
-            try {
-                Files.createDirectory(directoryPath);
-            } catch (IOException e) {
-                throw new ResponseStatusException(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        "Could not create directory", e
-                );
-            }
-        }
-
-        Path path = directoryPath.resolve(newMediaName);
-
-        try {
-            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Could not copy file", e
-            );
-        }
-
-
-
-        return MediaResponse.builder()
-                .name(newMediaName)
-                .contentType(file.getContentType())
-                .extension(Utils.extractExtension(file.getOriginalFilename()))
-                .size(file.getSize())
-                .uri(String.format("%s%s/%s", baseUri, folderName, newMediaName))
-                .build();
-
-    }
-
-    @Override
     public List<MediaResponse> uploadMultiple(String eventUuid, List<MultipartFile> files, String s) {
 
         Event event = eventRepository.findByUuid(eventUuid)
@@ -113,37 +71,9 @@ public class MediaServiceImpl implements MediaService{
     }
 
     @Override
-    public BasedMessage deleteMediaByName(String mediaName) {
-
-        Path path = Paths.get(serverPath + mediaName);
-
-        try {
-            if (Files.deleteIfExists(path)) {
-
-                Media media = mediaRepository.findByName(mediaName)
-                        .orElseThrow(
-                                () -> new ResponseStatusException(
-                                        HttpStatus.NOT_FOUND,
-                                        "Media has not been found"
-                                )
-                        );
-
-                mediaRepository.delete(media);
-
-                return new BasedMessage("Media has been deleted");
-            } throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "Media has not been found");
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    String.format("Media path %s cannot be deleted", e.getLocalizedMessage()));
-        }
-
-    }
-
-    @Override
     public List<MediaResponse> loadAllMedias() {
 
-        Path path = Paths.get(serverPath + "\\");
+        Path path = Paths.get(serverPath + "/");
 
         try {
             List<MediaResponse> mediaResponses = new ArrayList<>();
@@ -179,39 +109,6 @@ public class MediaServiceImpl implements MediaService{
     }
 
     @Override
-    public MediaResponse getMediaByName(String mediaName) {
-
-        Path path = Paths.get(serverPath + "\\" + mediaName);
-
-        try {
-
-            Resource resource = new UrlResource(path.toUri());
-            log.info("Load resource: {}", resource.getFilename());
-
-            if (!resource.exists()) {
-                throw new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Media has not been found!"
-                );
-            }
-
-            return MediaResponse.builder()
-                    .name(mediaName)
-                    .contentType(Files.probeContentType(path))
-                    .extension(Utils.extractExtension(mediaName))
-                    .size(resource.contentLength())
-                    .uri(String.format("%s%s/%s", baseUri, mediaName ))
-                    .build();
-
-        } catch (IOException e) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    e.getLocalizedMessage()
-            );
-        }
-    }
-
-    @Override
     public List<MediaResponse> getMediaByEvent(String uuid) {
 
         Event event = eventRepository.findByUuid(uuid)
@@ -225,5 +122,95 @@ public class MediaServiceImpl implements MediaService{
         List<Media> media = event.getMedias();
 
         return mediaMapper.toMediaResponseList(media);
+    }
+
+    @Override
+    public MediaResponse uploadSingle(MultipartFile file, String folderName) {
+
+        String newMediaName = Utils.generateUuid() + Utils.extractExtension(file.getOriginalFilename());
+
+        // Construct directory path
+        Path directoryPath = Paths.get(serverPath, folderName);
+        if (!Files.exists(directoryPath)) {
+            try {
+                Files.createDirectories(directoryPath);  // Create parent directories if necessary
+            } catch (IOException e) {
+                throw new ResponseStatusException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Could not create directory", e
+                );
+            }
+        }
+
+        // Resolve file path
+        Path path = directoryPath.resolve(newMediaName);
+
+        try {
+            Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    "Could not copy file", e
+            );
+        }
+
+        return MediaResponse.builder()
+                .name(newMediaName)
+                .contentType(file.getContentType())
+                .extension(Utils.extractExtension(file.getOriginalFilename()))
+                .size(file.getSize())
+                .uri(String.format("%s%s/%s", baseUri, folderName, newMediaName))
+                .build();
+    }
+
+    @Override
+    public void deleteMediaByName(String mediaName) {
+
+        // Correct path construction
+        Path path = Paths.get(serverPath, mediaName);
+        log.info("Path: {}", path);
+
+        try {
+            Files.deleteIfExists(path);
+            if (mediaRepository.existsByName(mediaName)) {
+                Media media = mediaRepository.findByName(mediaName)
+                        .orElseThrow(() -> new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST, "Media does not exist"));
+                mediaRepository.delete(media);
+            }
+        } catch (IOException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    String.format("Media path '%s' cannot be deleted", e.getLocalizedMessage()), e
+            );
+        }
+    }
+
+    @Override
+    public MediaResponse getMediaByName(String mediaName) {
+        // Construct file path
+        Path path = Paths.get(serverPath, mediaName);
+
+        try {
+            Resource resource = new UrlResource(path.toUri());
+            log.info("Load resource: {}", resource.getFilename());
+
+            if (!resource.exists()) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Media not found");
+            }
+
+            return MediaResponse.builder()
+                    .name(mediaName)
+                    .contentType(Files.probeContentType(path))
+                    .extension(Utils.extractExtension(mediaName))
+                    .size(resource.contentLength())
+                    .uri(String.format("%s%s", baseUri, mediaName))
+                    .build();
+        } catch (IOException e) {
+            throw new ResponseStatusException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    e.getLocalizedMessage(), e
+            );
+        }
     }
 }

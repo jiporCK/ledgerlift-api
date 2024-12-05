@@ -4,10 +4,12 @@ import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.user.dto.RegistrationRequest;
-import com.example.ledgerlift.features.user.dto.UserDetail;
+import com.example.ledgerlift.features.user.dto.UserDetailResponse;
 import com.example.ledgerlift.features.user.dto.UserResponse;
 import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface UserService {
@@ -32,5 +34,7 @@ public interface UserService {
 
     void deleteUserByUuid(String uuid);
 
-    UserDetail getUserInfo(String uuid);
+    UserDetailResponse getUserInfo(String uuid);
+
+    void updateUserDOB(String uuid, LocalDateTime birthday);
 }

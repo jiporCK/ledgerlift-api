@@ -4,7 +4,7 @@ DB_HOST: localhost
 DB_PORT: 5432
 DB_NAME: idonatedb
 
-MEDIA_SERVER_PATH: src/main/resources/filestorage/idata-medias/
+MEDIA_SERVER_PATH: src/main/resources/filestorage/idonate-medias/
 MEDIA_BASE_URI=http: http://localhost:8080/media
 MEDIA_CLIENT_PATH: /media/**
 

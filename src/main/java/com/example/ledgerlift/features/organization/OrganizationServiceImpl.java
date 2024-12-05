@@ -2,6 +2,7 @@ package com.example.ledgerlift.features.organization;
 
 import com.example.ledgerlift.domain.Event;
 import com.example.ledgerlift.domain.Organization;
+import com.example.ledgerlift.domain.Role;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.ca.CAService;
 import com.example.ledgerlift.features.ca.dto.CAEnrollmentRequest;
@@ -11,6 +12,7 @@ import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
 import com.example.ledgerlift.features.user.UserRepository;
+import com.example.ledgerlift.init.RoleRepository;
 import com.example.ledgerlift.mapper.OrganizationMapper;
 import com.example.ledgerlift.utils.Utils;
 import jakarta.transaction.Transactional;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -29,6 +32,7 @@ public class OrganizationServiceImpl implements OrganizationService {
 
     private final OrganizationRepository organizationRepository;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
     private final OrganizationMapper organizationMapper;
     private final MailService mailService;
     private final EventRepository eventRepository;
@@ -194,6 +198,14 @@ public class OrganizationServiceImpl implements OrganizationService {
                     .build();
 
             caService.registerAndEnrollUser(caEnrollmentRequest.getUsername(), caEnrollmentRequest);
+
+            User user = organization.getUser();
+            List<Role> roles = user.getRoles();
+            Role organizer = roleRepository.findByName("ORGANIZER");
+            roles.add(organizer);
+
+            user.setRoles(roles);
+            userRepository.save(user);
 
         } catch (ResponseStatusException e) {
             // If the exception is related to already registered or enrolled user, allow the login to proceed

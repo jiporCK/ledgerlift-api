@@ -44,12 +44,10 @@ public class User extends Auditable {
     @Column(unique = true, nullable = false)
     private String email;
 
-    private String gender;
-
     private String avatar;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date dateOfBirth;
+    private LocalDateTime dateOfBirth;
 
     private Boolean isProfiledVisibility;
 
@@ -71,6 +69,9 @@ public class User extends Auditable {
     private Boolean isBlocked;
 
     private boolean isDeleted;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    private Media media;
 
     @OneToMany(mappedBy = "user")
     private List<Organization> organizations;

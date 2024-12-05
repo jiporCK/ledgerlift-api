@@ -12,4 +12,6 @@ public interface MediaMapper {
     List<Media> fromMediaResponseList(List<MediaResponse> mediaResponseList);
 
     List<MediaResponse> toMediaResponseList(List<Media> media);
+
+    Media toMediaResponse(MediaResponse mediaResponse);
 }
