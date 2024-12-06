@@ -21,6 +21,10 @@ public interface OrganizationRepository extends JpaRepository<Organization, Long
     void lockByUuid(@Param("uuid")String uuid);
 
     @Modifying
+    @Query("UPDATE Organization o SET o.isLocked = FALSE WHERE o.uuid = :uuid")
+    void unlockByUuid(@Param("uuid")String uuid);
+
+    @Modifying
     @Query("UPDATE Organization o SET o.isApproved = TRUE WHERE o.uuid = :uuid")
     void approveByUuid(String uuid);
 }

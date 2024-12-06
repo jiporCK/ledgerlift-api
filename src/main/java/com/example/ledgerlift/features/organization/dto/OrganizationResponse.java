@@ -16,6 +16,8 @@ public record OrganizationResponse(
 
         String address,
 
+        boolean isApproved,
+
         UserResponse user
 
 ) {

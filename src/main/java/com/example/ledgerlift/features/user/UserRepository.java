@@ -28,4 +28,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("UPDATE User u SET u.isBlocked = FALSE WHERE u.uuid = :uuid")
     void unBlockByUuid(@Param("uuid") String uuid);
 
+    Optional<User> findByAvatar(String avatar);
+
+    boolean existsByAvatar(String avatar);
 }

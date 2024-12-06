@@ -21,8 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -61,6 +59,7 @@ public class OrganizationServiceImpl implements OrganizationService {
         organization.setUuid(Utils.generateUuid());
         organization.setUser(user);
         organization.setIsLocked(false);
+        organization.setIsApproved(false);
 
         organizationRepository.save(organization);
         mailService.welcomeOrganization(organization);
@@ -161,6 +160,26 @@ public class OrganizationServiceImpl implements OrganizationService {
         }
     }
 
+    @Transactional
+    @Override
+    public void unlockOrganization(String organizationUuid) {
+
+        Organization organization = organizationRepository.findByUuid(organizationUuid)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Organization with uuid " + organizationUuid + " not found"
+                ));
+
+        organizationRepository.unlockByUuid(organization.getUuid());
+
+        List<Event> events = organization.getEvents();
+        if (events != null && !events.isEmpty()) {
+            events.forEach(event -> event.setIsVisible(Boolean.TRUE));
+
+            eventRepository.saveAll(events);
+        }
+    }
+
     @Override
     public List<OrganizationResponse> getPendingOrganization() {
 
@@ -169,9 +188,19 @@ public class OrganizationServiceImpl implements OrganizationService {
                         org -> org.getIsApproved().equals(Boolean.FALSE)
                 ).toList();
 
+        if (organizations.isEmpty()) {
+
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND,
+                    "There is no pending organization"
+            );
+
+        }
+
         return organizationMapper.toOrganizationResponseList(organizations);
     }
 
+    @Transactional
     @Override
     public void approveOrg(String organizationUuid) {
 
@@ -182,6 +211,12 @@ public class OrganizationServiceImpl implements OrganizationService {
                                 "Organization with uuid " + organizationUuid + " not found"
                         )
                 );
+
+        if (organization.getIsApproved().equals(Boolean.TRUE)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Organization is already approved"
+            );
+        }
 
         organizationRepository.approveByUuid(organizationUuid);
 

@@ -1,8 +1,6 @@
 package com.example.ledgerlift.features.organization;
 
 import com.example.ledgerlift.base.BasedMessage;
-import com.example.ledgerlift.domain.Organization;
-import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationRequest;
 import com.example.ledgerlift.features.organization.dto.OrganizationResponse;
@@ -19,7 +17,6 @@ import java.util.List;
 public class OrganizationController {
 
     private final OrganizationService organizationService;
-    private final MailService mailService;
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/{userUuid}")
@@ -76,11 +73,20 @@ public class OrganizationController {
     @PutMapping("/{organizationUuid}/lock")
     BasedMessage lockOrganization(@PathVariable String organizationUuid) {
 
-        organizationService.lockOrganization(organizationUuid);
+        organizationService.unlockOrganization(organizationUuid);
 
-        return new BasedMessage("Organization has been locked");
+        return new BasedMessage("Organization has been unlocked");
 
     }
+    @PutMapping("/{organizationUuid}/unlock")
+    BasedMessage unlockOrganization(@PathVariable String organizationUuid) {
+
+        organizationService.lockOrganization(organizationUuid);
+
+        return new BasedMessage("Organization has been unlocked");
+
+    }
+
 
     @PutMapping("/{organizationUuid}/approve-org")
     BasedMessage approveOrganization(@PathVariable String organizationUuid) {

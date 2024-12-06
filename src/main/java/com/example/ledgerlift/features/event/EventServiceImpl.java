@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -62,6 +64,7 @@ public class EventServiceImpl implements EventService {
         event.setIsUrgent(false);
         event.setOrganization(organization);
         event.setCategory(category);
+        event.setCurrentRaised(BigDecimal.valueOf(0.0));
 
         eventRepository.save(event);
 

@@ -59,6 +59,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> {
                     request
                             .requestMatchers(HttpMethod.POST, "api/v1/users/**").permitAll()
+                            .requestMatchers(HttpMethod.PUT, "api/v1/users/{uuid}/upload-image/**").permitAll()
                             .requestMatchers(HttpMethod.GET, "api/v1/users/me").hasAnyAuthority("SCOPE_donor:read", "SCOPE_admin:read", "SCOPE_organizer:read")
                             .requestMatchers(HttpMethod.GET, "api/v1/users/**").hasAnyAuthority("SCOPE_admin:read", "SCOPE_admin:write")
                             .requestMatchers("api/v1/donate/**").hasAnyAuthority("SCOPE_donor:read", "SCOPE_donor:write")
@@ -68,6 +69,8 @@ public class SecurityConfig {
                                     "/swagger-ui/**",           // Default Swagger UI assets
                                     "/ledgeraiser-api-ui.html"  // Custom Swagger UI
                             ).permitAll()
+                            .requestMatchers(HttpMethod.POST, "api/v1/chaincode/**").hasAnyAuthority("SCOPE_donor:read", "SCOPE_donor:write")
+                            .requestMatchers(HttpMethod.GET, "api/v1/chaincode/**").hasAnyAuthority("SCOPE_donor:read", "SCOPE_donor:write")
                             .requestMatchers(HttpMethod.POST, "api/v1/auth/**").permitAll()
                             .requestMatchers("api/v1/enrollment/**").permitAll()
                             .requestMatchers(HttpMethod.GET, "api/v1/organizations/get-pending-organizations").hasAuthority("SCOPE_admin:read")

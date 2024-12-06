@@ -2,8 +2,10 @@ package com.example.ledgerlift.features.media;
 
 import com.example.ledgerlift.domain.Event;
 import com.example.ledgerlift.domain.Media;
+import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.features.event.EventRepository;
 import com.example.ledgerlift.features.media.dto.MediaResponse;
+import com.example.ledgerlift.features.user.UserRepository;
 import com.example.ledgerlift.mapper.MediaMapper;
 import com.example.ledgerlift.utils.Utils;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,7 @@ public class MediaServiceImpl implements MediaService{
     private final EventRepository eventRepository;
     private final MediaMapper mediaMapper;
     private final MediaRepository mediaRepository;
+    private final UserRepository userRepository;
 
     @Value("${media.server-path}")
     private String serverPath;
@@ -176,7 +179,23 @@ public class MediaServiceImpl implements MediaService{
                 Media media = mediaRepository.findByName(mediaName)
                         .orElseThrow(() -> new ResponseStatusException(
                                 HttpStatus.BAD_REQUEST, "Media does not exist"));
+
+                log.info("Media name: {}", media.getName());
                 mediaRepository.delete(media);
+
+                if (userRepository.existsByAvatar(mediaName)) {
+                    User user = userRepository.findByAvatar(mediaName)
+                            .orElseThrow(
+                                    () -> new ResponseStatusException(
+                                            HttpStatus.NOT_FOUND,
+                                            "User with avatar: [" + mediaName + "] has not been found"
+                                    )
+                            );
+
+                    user.setAvatar(null);
+                    userRepository.save(user);
+                }
+
             }
         } catch (IOException e) {
             throw new ResponseStatusException(

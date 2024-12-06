@@ -28,10 +28,10 @@ public class Media {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long size;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.DETACH)
     private Event event;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.DETACH)
     private User user;
 
 }

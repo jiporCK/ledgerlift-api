@@ -70,7 +70,7 @@ public class User extends Auditable {
 
     private boolean isDeleted;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user")
     private Media media;
 
     @OneToMany(mappedBy = "user")

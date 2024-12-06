@@ -30,4 +30,5 @@ public interface OrganizationService {
 
     void approveOrg(String organizationUuid);
 
+    void unlockOrganization(String organizationUuid);
 }
