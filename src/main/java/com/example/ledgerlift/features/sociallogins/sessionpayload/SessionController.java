@@ -2,10 +2,8 @@ package com.example.ledgerlift.features.sociallogins.sessionpayload;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/sessions")
@@ -14,6 +12,7 @@ public class SessionController {
 
     private final SessionService sessionService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/facebook-payload")
     public void faceBookPayload(@RequestBody FacebookPayload facebookPayload, final HttpServletRequest request) {
 
@@ -21,6 +20,7 @@ public class SessionController {
 
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/google-payload")
     public void googlePayload(@RequestBody GooglePayload googlePayload, final HttpServletRequest request) {
 

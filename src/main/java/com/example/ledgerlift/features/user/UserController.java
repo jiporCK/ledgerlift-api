@@ -1,8 +1,8 @@
 package com.example.ledgerlift.features.user;
 
 import com.example.ledgerlift.base.BasedMessage;
+import com.example.ledgerlift.base.RegistrationMessage;
 import com.example.ledgerlift.domain.Role;
-import com.example.ledgerlift.domain.SocialLogin;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.event.RegistrationCompleteEvent;
 import com.example.ledgerlift.features.mail.MailService;
@@ -53,7 +53,8 @@ public class UserController {
     }
 
     @PostMapping("/user-registration")
-    public BasedMessage createUser(@Valid @RequestBody RegistrationRequest request, final HttpServletRequest servletRequest) {
+    public BasedMessage createUser(@Valid @RequestBody RegistrationRequest request, final HttpServletRequest servletRequest,
+                                   @RequestParam(required = false, defaultValue = "false") boolean isSocialLogin) {
 
         UserResponse response = userService.createUser(request);
         User user = userMapper.fromUserResponse(response);
@@ -77,14 +78,22 @@ public class UserController {
         user.setDeleted(false);
         user.setIsBlocked(false);
 
+        if (isSocialLogin) {
+            user.setIsEmailVerified(true);
+        }
+
         userRepository.save(user);
 
         log.info("User: {}", user);
 
-        eventPublisher.publishEvent(new RegistrationCompleteEvent(user, Utils.getApplicationUrl(servletRequest)));
+        if (!isSocialLogin) {
+            eventPublisher.publishEvent(new RegistrationCompleteEvent(user, Utils.getApplicationUrl(servletRequest)));
+        }
 
         return BasedMessage.builder()
-                .message("User has been registered, Please verify your email address")
+                .message(isSocialLogin
+                    ? "User has been registered successfully via social login"
+                    : "User has been registered, Please verify your email address")
                 .build();
 
     }

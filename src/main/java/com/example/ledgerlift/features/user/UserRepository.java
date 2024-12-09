@@ -31,4 +31,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByAvatar(String avatar);
 
     boolean existsByAvatar(String avatar);
+
+    @Modifying
+    @Query("UPDATE User u SET u.isEmailVerified = TRUE WHERE u.uuid = :uuid")
+    void verifyByUuid(String uuid);
+
 }

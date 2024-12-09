@@ -3,8 +3,6 @@ package com.example.ledgerlift.features.mail.verificationToken;
 import com.example.ledgerlift.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-
 import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;

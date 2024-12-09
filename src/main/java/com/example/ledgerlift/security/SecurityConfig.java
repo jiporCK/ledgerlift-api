@@ -58,6 +58,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(request -> {
                     request
+                            .requestMatchers(HttpMethod.POST, "api/v1/sessions/**").permitAll()
                             .requestMatchers(HttpMethod.POST, "api/v1/users/**").permitAll()
                             .requestMatchers(HttpMethod.PUT, "api/v1/users/{uuid}/upload-image/**").permitAll()
                             .requestMatchers(HttpMethod.GET, "api/v1/users/me").hasAnyAuthority("SCOPE_donor:read", "SCOPE_admin:read", "SCOPE_organizer:read")

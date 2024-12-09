@@ -37,4 +37,7 @@ public interface UserService {
     UserDetailResponse getUserInfo(String uuid);
 
     void updateUserDOB(String uuid, LocalDateTime birthday);
+
+    void verifyUser(String uuid, VerificationToken.TokenType tokenType);
+
 }

@@ -51,6 +51,7 @@ public class User extends Auditable {
 
     private Boolean isProfiledVisibility;
 
+    @Column(nullable = false)
     private Boolean isEmailVerified;
 
     private Boolean isAccountVerified;
