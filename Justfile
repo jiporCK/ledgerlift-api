@@ -4,7 +4,7 @@ network option:
         "up")
             set -e # exit on first error
             echo "🚀 Bringing up the network 🚀"
-            cd fabric-samples/test-network && bash  network.sh up createChannel -ca
+            cd fabric-samples/test-network && bash network.sh up createChannel -ca
             echo "Deploy default chaincode "
             bash network.sh deployCC
             ;;

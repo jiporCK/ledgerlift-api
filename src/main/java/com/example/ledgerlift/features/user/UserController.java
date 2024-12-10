@@ -1,7 +1,6 @@
 package com.example.ledgerlift.features.user;
 
 import com.example.ledgerlift.base.BasedMessage;
-import com.example.ledgerlift.base.RegistrationMessage;
 import com.example.ledgerlift.domain.Role;
 import com.example.ledgerlift.domain.User;
 import com.example.ledgerlift.event.RegistrationCompleteEvent;
@@ -10,9 +9,13 @@ import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
 import com.example.ledgerlift.features.media.dto.ImageRequest;
 import com.example.ledgerlift.features.user.dto.*;
+import com.example.ledgerlift.features.user.forgetpassworddto.ForgetPasswordRequest;
+import com.example.ledgerlift.features.user.forgetpassworddto.ForgetPasswordResponse;
+import com.example.ledgerlift.features.user.forgetpassworddto.PasswordResetRequest;
 import com.example.ledgerlift.init.RoleRepository;
 import com.example.ledgerlift.mapper.UserMapper;
 import com.example.ledgerlift.utils.Utils;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,9 +27,11 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -200,6 +205,38 @@ public class UserController {
         return BasedMessage.builder()
                 .message("User deleted successfully")
                 .build();
+
+    }
+
+    @PostMapping("/forget-password")
+    public ForgetPasswordResponse forgetPassword(@Valid @RequestBody ForgetPasswordRequest request,
+                                                 final HttpServletRequest servletRequest) throws MessagingException, UnsupportedEncodingException {
+
+        String token =  userService.forgetPassword(request.email(), servletRequest);
+
+        return new ForgetPasswordResponse(token);
+
+    }
+
+    @PostMapping("/password-reset")
+    public BasedMessage verifyForgetPassword(@Valid @RequestBody PasswordResetRequest request,
+                                             @RequestParam String token) {
+
+        String validation = userService.validateForgetPasswordToken(token);
+
+        if (!validation.equals("valid")) {
+            return new BasedMessage("Invalid token");
+        }
+
+        userService.resetUserPassword(request);
+
+        VerificationToken forgetToken = verificationTokenRepository.findByToken(token);
+
+        forgetToken.setIsUsed(true);
+
+        verificationTokenRepository.save(forgetToken);
+
+        return new BasedMessage("Password reset successfully");
 
     }
 

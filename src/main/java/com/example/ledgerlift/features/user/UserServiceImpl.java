@@ -3,6 +3,7 @@ package com.example.ledgerlift.features.user;
 import com.example.ledgerlift.base.BasedMessage;
 import com.example.ledgerlift.domain.Media;
 import com.example.ledgerlift.domain.User;
+import com.example.ledgerlift.features.mail.MailService;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationToken;
 import com.example.ledgerlift.features.mail.verificationToken.VerificationTokenRepository;
 import com.example.ledgerlift.features.media.MediaRepository;
@@ -13,19 +14,19 @@ import com.example.ledgerlift.features.user.dto.RegistrationRequest;
 import com.example.ledgerlift.features.user.dto.UserDetailResponse;
 import com.example.ledgerlift.features.user.dto.UserResponse;
 import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
+import com.example.ledgerlift.features.user.forgetpassworddto.PasswordResetRequest;
 import com.example.ledgerlift.mapper.MediaMapper;
 import com.example.ledgerlift.mapper.UserMapper;
+import com.example.ledgerlift.utils.MailUtils;
 import com.example.ledgerlift.utils.Utils;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.asn1.cms.MetaData;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class UserServiceImpl implements UserService {
     private final MediaRepository mediaRepository;
     private final MediaMapper mediaMapper;
     private final MediaService mediaService;
+    private final MailService mailService;
 
     @Override
     public UserResponse createUser(RegistrationRequest request) {
@@ -249,4 +251,90 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public void saveForgetPasswordToken(User theUser, String forgetPasswordToken, VerificationToken.TokenType tokenType) {
+
+        VerificationToken token = new VerificationToken(forgetPasswordToken, VerificationToken.TokenType.FORGET_PASSWORD);
+
+        token.setUser(theUser);
+
+        verificationTokenRepository.save(token);
+
+    }
+
+    @Override
+    public String forgetPassword(String email, final HttpServletRequest servletRequest) {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")
+                );
+
+        String token = MailUtils.generateDigitsToken();
+
+        saveForgetPasswordToken(user, token, VerificationToken.TokenType.FORGET_PASSWORD);
+
+        passwordResetLink(user, Utils.getApplicationUrl(servletRequest), token);
+
+        return token;
+
+    }
+
+    @Override
+    public void passwordResetLink(User user, String appUrl, String forgetPasswordToken) {
+
+        // replace this with reset password frontend
+        String url = appUrl + "/api/v1/users/" + user.getEmail() + "/password-reset?token=" + forgetPasswordToken;
+
+        mailService.sendTokenForPasswordRequest(url, user);
+
+    }
+
+    @Override
+    public String validateForgetPasswordToken(String token) {
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
+
+        if (verificationToken.isExpired()) {
+            return "Token is already expired";
+        }
+
+        if (verificationToken.getIsUsed()) {
+            return "Token is already used";
+        }
+
+        verificationToken.setIsUsed(true);
+        verificationTokenRepository.save(verificationToken);
+
+        return "valid";
+
+    }
+
+    @Override
+    public void resetUserPassword(PasswordResetRequest request) {
+
+        if (!userRepository.existsByEmail(request.email())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+        }
+
+        if (!request.newPassword().equals(request.confirmPassword())) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Password must be matched"
+            );
+        }
+
+        User user = userRepository.findByEmail(request.email())
+                        .orElseThrow(
+                                ()  -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found")
+                        );
+
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+
+        userRepository.save(user);
+
+        String relatedUpdate = "Reset Password";
+
+        mailService.accountNotification(user, relatedUpdate);
+
+    }
 }

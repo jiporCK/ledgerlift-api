@@ -7,7 +7,11 @@ import com.example.ledgerlift.features.user.dto.RegistrationRequest;
 import com.example.ledgerlift.features.user.dto.UserDetailResponse;
 import com.example.ledgerlift.features.user.dto.UserResponse;
 import com.example.ledgerlift.features.user.dto.UserUpdateRequest;
+import com.example.ledgerlift.features.user.forgetpassworddto.PasswordResetRequest;
+import jakarta.mail.MessagingException;
+import jakarta.servlet.http.HttpServletRequest;
 
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +30,8 @@ public interface UserService {
 
     void saveUserVerificationToken(User theUser, String verificationToken, VerificationToken.TokenType tokenType);
 
+    void saveForgetPasswordToken(User theUser, String forgetPasswordToken, VerificationToken.TokenType tokenType);
+
     void updateUser(String uuid, UserUpdateRequest request);
 
     void blockUserByUuid(String uuid);
@@ -39,5 +45,13 @@ public interface UserService {
     void updateUserDOB(String uuid, LocalDateTime birthday);
 
     void verifyUser(String uuid, VerificationToken.TokenType tokenType);
+
+    String forgetPassword(String email, final HttpServletRequest servletRequest) throws MessagingException, UnsupportedEncodingException;
+
+    void passwordResetLink(User user, String appUrl, String forgetPasswordToken);
+
+    String validateForgetPasswordToken(String token);
+
+    void resetUserPassword(PasswordResetRequest request);
 
 }

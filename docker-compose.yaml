@@ -1,0 +1,47 @@
+#version: '3.4'
+
+services:
+  # Hyperledger Fabric Peer (example)
+  fabric-peer:
+    image: hyperledger/fabric-peer
+    container_name: fabric-peer
+    environment:
+      - CORE_PEER_ID=peer0.org1.example.com
+      - CORE_PEER_ADDRESS=peer0.org1.example.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.org1.example.com:7052
+    ports:
+      - "8051:7051"
+      - "8053:7053" # Used for chaincode support
+    volumes:
+      - ./fabric-artifacts:/etc/hyperledger/fabric
+      - ./peer/core.yaml:/etc/hyperledger/fabric/core.yaml
+    networks:
+      - fabric-network
+
+  # Spring Boot Application
+  spring-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: spring-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      FABRIC_PEER_URL: grpc://fabric-peer:7051  # Pointing to the Fabric peer container
+      FABRIC_CFG_PATH: /etc/hyperledger/fabric
+    depends_on:
+      - fabric-peer
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    networks:
+      - fabric-network
+
+networks:
+  fabric-network:
+    driver: bridge

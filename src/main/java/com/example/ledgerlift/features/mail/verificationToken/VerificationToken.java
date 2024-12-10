@@ -39,7 +39,7 @@ public class VerificationToken {
 
     public enum TokenType {
         EMAIL_VERIFICATION,
-        RESET_PASSWORD
+        FORGET_PASSWORD
     }
 
     public VerificationToken(String token, TokenType type) {
